@@ -152,10 +152,27 @@ void PWM_Config(TIM_TypeDef *TIM, uint8_t channel, uint16_t pulse, uint16_t mode
 
 	#define CHECKER_COLUMNS    44
 	#define CHECKER_ROWS       20
+#elif defined SYSCLK_FREQ_6MHZ_HSI
+    #define CLOCK_PRESCALER     6 // 48MHz / 8 = 6MHz
+    #define TICK_CNT_DIVIDER    6 // Converts 36MHz ticks to 6MHz ticks
+
+	#define VGA_HSYNC_PERIOD  100//(1024/TICK_CNT_DIVIDER) // 128
+	#define VGA_HSYNC_PULSE    (72/TICK_CNT_DIVIDER) // 9
+	
+	#define VGA_VPERIOD       625
+	#define VGA_VSYNC_PULSE     2
+
+	#define VGA_VBACK_PORCH    22
+	#define VGA_VFRONT_PORCH    1
+
+	#define VGA_HBACK_PORCH    16//(128/TICK_CNT_DIVIDER) // 16
+
+	#define CHECKER_COLUMNS    10
+	#define CHECKER_ROWS       10
 #endif
 
 int main(void) {
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
 	SystemCoreClockUpdate();
 	
 	// Disable GPIO Alternate Functions and extrnal oscilator
@@ -174,7 +191,7 @@ int main(void) {
 	// HSync
 	// Timer Config
 	GPIO_PinRemapConfig(GPIO_PartialRemap1_TIM2, ENABLE);
-	Timer_Config(VGA_HSYNC_TIM, VGA_HSYNC_PERIOD, 1, TIM_CounterMode_Up);
+	Timer_Config(VGA_HSYNC_TIM, VGA_HSYNC_PERIOD, CLOCK_PRESCALER, TIM_CounterMode_Up);
 	// PWM Config
 	PWM_Config(VGA_HSYNC_TIM, VGA_HSYNC_CH, VGA_HSYNC_PULSE, TIM_OCMode_PWM1);
 	// Interrupt Config
