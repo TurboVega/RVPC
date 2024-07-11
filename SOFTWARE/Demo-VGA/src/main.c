@@ -429,7 +429,7 @@ int main(void) {
         if (current_row != prior_row) {
             prior_row = current_row;
             if (current_row < VGA_VACTIVE_LINES) {
-                for (int i = 0; i < 70; i++) waste_time();
+                for (int i = 0; i < 72; i++) waste_time();
                 write_pixels();
             }
             volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
