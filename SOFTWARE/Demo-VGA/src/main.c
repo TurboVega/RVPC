@@ -125,8 +125,12 @@ void PWM_Config(TIM_TypeDef *TIM, uint8_t channel, uint16_t pulse, uint16_t mode
 #define VGA_VSYNC_CH    2
 
 #ifdef SYSCLK_FREQ_24MHZ_HSI
+    #define CLOCK_PRESCALER     4
+    #define TIMER_OC_MODE       TIM_OCMode_PWM1
+
 	#define VGA_HSYNC_PERIOD  412
 	#define VGA_HSYNC_PULSE    46
+	#define VGA_HBACK_PORCH     8
 
 	#define VGA_VPERIOD       525
 	#define VGA_VSYNC_PULSE     2
@@ -134,13 +138,15 @@ void PWM_Config(TIM_TypeDef *TIM, uint8_t channel, uint16_t pulse, uint16_t mode
 	#define VGA_VBACK_PORCH    12
 	#define VGA_VFRONT_PORCH   10
 
-	#define VGA_HBACK_PORCH     8
-
 	#define CHECKER_COLUMNS    25
 	#define CHECKER_ROWS       30
 #elif defined SYSCLK_FREQ_48MHZ_HSI
+    #define CLOCK_PRESCALER     2
+    #define TIMER_OC_MODE       TIM_OCMode_PWM1
+
 	#define VGA_HSYNC_PERIOD  824
 	#define VGA_HSYNC_PULSE    92
+	#define VGA_HBACK_PORCH    14
 	
 	#define VGA_VPERIOD       525
 	#define VGA_VSYNC_PULSE     2
@@ -148,24 +154,23 @@ void PWM_Config(TIM_TypeDef *TIM, uint8_t channel, uint16_t pulse, uint16_t mode
 	#define VGA_VBACK_PORCH    12
 	#define VGA_VFRONT_PORCH   10
 
-	#define VGA_HBACK_PORCH    14
-
 	#define CHECKER_COLUMNS    44
 	#define CHECKER_ROWS       20
 #elif defined SYSCLK_FREQ_6MHZ_HSI
-    #define CLOCK_PRESCALER     6 // 48MHz / 8 = 6MHz
-    #define TICK_CNT_DIVIDER    6 // Converts 36MHz ticks to 6MHz ticks
+    #define CLOCK_PRESCALER     4 // 48MHz / 4 = 12MHz
+    #define TICK_CNT_DIVIDER    6 // Converts 36MHz tick counts to 6MHz tick counts
+    #define TIMER_OC_MODE       TIM_OCMode_PWM1
 
-	#define VGA_HSYNC_PERIOD  100//(1024/TICK_CNT_DIVIDER) // 128
-	#define VGA_HSYNC_PULSE    (72/TICK_CNT_DIVIDER) // 9
+    #define VGA_HACTIVE_PIXELS 800
+	#define VGA_HBACK_PORCH    ((128)/TICK_CNT_DIVIDER) // 22
+	#define VGA_HSYNC_PERIOD  ((1024)/TICK_CNT_DIVIDER) // 171
+	#define VGA_HSYNC_PULSE     ((72)/TICK_CNT_DIVIDER) // 12
 	
 	#define VGA_VPERIOD       625
 	#define VGA_VSYNC_PULSE     2
 
 	#define VGA_VBACK_PORCH    22
 	#define VGA_VFRONT_PORCH    1
-
-	#define VGA_HBACK_PORCH    16//(128/TICK_CNT_DIVIDER) // 16
 
 	#define CHECKER_COLUMNS    10
 	#define CHECKER_ROWS       10
@@ -191,9 +196,9 @@ int main(void) {
 	// HSync
 	// Timer Config
 	GPIO_PinRemapConfig(GPIO_PartialRemap1_TIM2, ENABLE);
-	Timer_Config(VGA_HSYNC_TIM, VGA_HSYNC_PERIOD, CLOCK_PRESCALER, TIM_CounterMode_Up);
+	Timer_Config(VGA_HSYNC_TIM, VGA_HSYNC_PERIOD, (CLOCK_PRESCALER-1), TIM_CounterMode_Up);
 	// PWM Config
-	PWM_Config(VGA_HSYNC_TIM, VGA_HSYNC_CH, VGA_HSYNC_PULSE, TIM_OCMode_PWM1);
+	PWM_Config(VGA_HSYNC_TIM, VGA_HSYNC_CH, VGA_HSYNC_PULSE, TIMER_OC_MODE);
 	// Interrupt Config
 	Timer_Interrupt(VGA_HSYNC_TIM);
 
@@ -202,7 +207,7 @@ int main(void) {
 	GPIO_PinRemapConfig(GPIO_PartialRemap2_TIM1, ENABLE);
 	Slave_Timer_Config(VGA_VSYNC_TIM, VGA_HSYNC_TIM, TIM_TRGOSource_OC4Ref, VGA_VPERIOD, TIM_CounterMode_Up);
 	// PWM Config
-	PWM_Config(VGA_VSYNC_TIM, VGA_VSYNC_CH, VGA_VSYNC_PULSE, TIM_OCMode_PWM1);
+	PWM_Config(VGA_VSYNC_TIM, VGA_VSYNC_CH, VGA_VSYNC_PULSE, TIMER_OC_MODE);
 
 	// Start timers
 	TIM_Cmd(VGA_VSYNC_TIM, ENABLE);
@@ -237,39 +242,23 @@ void TIM1_IRQHandler(void) {
 
 void TIM2_IRQHandler(void)   __attribute__((interrupt("WCH-Interrupt-fast")));
 void TIM2_IRQHandler(void) {
-	static volatile uint32_t current_row = 0;
-	static volatile uint8_t hback_porch = 0;
-	static volatile uint8_t data = 1;
-	static volatile uint8_t checker = 0;
-	static volatile uint8_t data_start = 1;
-
-	current_row = VGA_VSYNC_TIM->CNT;
-	if (current_row <= VGA_VBACK_PORCH || current_row >= (VGA_VPERIOD - VGA_VFRONT_PORCH)) {
-		checker = 0;
-		data_start = 1;
-		data = 1;
-		goto exit;
+	uint32_t current_row = VGA_VSYNC_TIM->CNT;
+	if (current_row < VGA_HACTIVE_PIXELS) {
+        VGA_DATA_GPIO->BSHR = VGA_DATA_PIN;
+        VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
+        VGA_DATA_GPIO->BSHR = VGA_DATA_PIN;
+        VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
+        VGA_DATA_GPIO->BSHR = VGA_DATA_PIN;
+        VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
+        VGA_DATA_GPIO->BSHR = VGA_DATA_PIN;
+        VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
+        VGA_DATA_GPIO->BSHR = VGA_DATA_PIN;
+        VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
+        VGA_DATA_GPIO->BSHR = VGA_DATA_PIN;
+        VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
+        VGA_DATA_GPIO->BSHR = VGA_DATA_PIN;
 	}
 
-	// Stupid delay
-	for (uint8_t p=0; p < VGA_HBACK_PORCH; p++) {
-		hback_porch = hback_porch ^ 1;
-	}
-
-	GPIO_WriteBit(VGA_DATA_GPIO, VGA_DATA_PIN, data);
-	for (uint8_t c=0; c < (CHECKER_COLUMNS - 1); c++) {
-		data = data ^ 1;
-		GPIO_WriteBit(VGA_DATA_GPIO, VGA_DATA_PIN, data);
-	}
-	GPIO_WriteBit(VGA_DATA_GPIO, VGA_DATA_PIN, 0);
-
-	checker++;
-	if (checker > CHECKER_ROWS) {
-		checker = 0;
-		data_start = data_start ^ 1;
-	}
-	data = data_start;
-exit:
-	GPIO_WriteBit(VGA_DATA_GPIO, VGA_DATA_PIN, 0);
+    VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
 	TIM_ClearITPendingBit(TIM2, TIM_IT_Update); 
 }
