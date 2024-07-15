@@ -179,6 +179,7 @@ void PWM_Config(TIM_TypeDef *TIM, uint8_t channel, uint16_t pulse, uint16_t mode
 
 void waste_time() {
     volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
+
     // 0
     *clr = VGA_DATA_PIN; // 0
     *clr = VGA_DATA_PIN;
@@ -222,6 +223,13 @@ void waste_time() {
     *clr = VGA_DATA_PIN;
     *clr = VGA_DATA_PIN; // 9
     *clr = VGA_DATA_PIN;
+
+    // 40
+    *clr = VGA_DATA_PIN; // 0
+    *clr = VGA_DATA_PIN;
+    *clr = VGA_DATA_PIN; // 1
+    *clr = VGA_DATA_PIN;
+
 }
 
 void write_pixels() {
