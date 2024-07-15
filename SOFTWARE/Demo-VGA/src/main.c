@@ -257,7 +257,7 @@ void write_pixels() {
     *clr = VGA_DATA_PIN;
     *set = VGA_DATA_PIN; // 9
     *set = VGA_DATA_PIN;
-/*
+
     // 20
     *set = VGA_DATA_PIN; // 0
     *clr = VGA_DATA_PIN;
@@ -433,7 +433,73 @@ void write_pixels() {
     *clr = VGA_DATA_PIN;
     *set = VGA_DATA_PIN; // 9
     *set = VGA_DATA_PIN;
-*/
+
+    // 180
+    *set = VGA_DATA_PIN; // 0
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 1
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 2
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 3
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 4
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 5
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 6
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 7
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 8
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 9
+    *set = VGA_DATA_PIN;
+
+    // 200
+    *set = VGA_DATA_PIN; // 0
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 1
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 2
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 3
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 4
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 5
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 6
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 7
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 8
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 9
+    *set = VGA_DATA_PIN;
+
+    // 220
+    *set = VGA_DATA_PIN; // 0
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 1
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 2
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 3
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 4
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 5
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 6
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 7
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 8
+    *clr = VGA_DATA_PIN;
+    *set = VGA_DATA_PIN; // 9
+    *set = VGA_DATA_PIN;
+
 }
 
 int main(void) {
