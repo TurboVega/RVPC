@@ -232,6 +232,291 @@ void waste_time() {
 
 }
 
+// Screen is 30 characters per line, 37 lines.
+#define CHARS_PER_LINE  30
+#define NUM_LINES       37
+#define CHAR_WIDTH       8
+#define CHAR_HEIGHT      8
+
+#define CHAR_LINE(n,d0, d1, d2, d3, d4, d5, d6, d7) \
+    (n == 0 ? d0 : \
+     n == 1 ? d1 : \
+     n == 2 ? d2 : \
+     n == 3 ? d3 : \
+     n == 4 ? d4 : \
+     n == 5 ? d5 : \
+     n == 6 ? d6 : \
+     d7)
+
+#define CHARSET_LINE(n) \
+    { \
+        CHAR_LINE(n, 0x00), \
+        CHAR_LINE(n, 0x01), \
+        CHAR_LINE(n, 0x02), \
+        CHAR_LINE(n, 0x03), \
+        CHAR_LINE(n, 0x04), \
+        CHAR_LINE(n, 0x05), \
+        CHAR_LINE(n, 0x06), \
+        CHAR_LINE(n, 0x07), \
+        CHAR_LINE(n, 0x08), \
+        CHAR_LINE(n, 0x09), \
+        CHAR_LINE(n, 0x0A), \
+        CHAR_LINE(n, 0x0B), \
+        CHAR_LINE(n, 0x0C), \
+        CHAR_LINE(n, 0x0D), \
+        CHAR_LINE(n, 0x0E), \
+        CHAR_LINE(n, 0x0F), \
+
+        CHAR_LINE(n, 0x00), \
+        CHAR_LINE(n, 0x01), \
+        CHAR_LINE(n, 0x02), \
+        CHAR_LINE(n, 0x03), \
+        CHAR_LINE(n, 0x04), \
+        CHAR_LINE(n, 0x05), \
+        CHAR_LINE(n, 0x06), \
+        CHAR_LINE(n, 0x07), \
+        CHAR_LINE(n, 0x08), \
+        CHAR_LINE(n, 0x09), \
+        CHAR_LINE(n, 0x0A), \
+        CHAR_LINE(n, 0x0B), \
+        CHAR_LINE(n, 0x0C), \
+        CHAR_LINE(n, 0x0D), \
+        CHAR_LINE(n, 0x0E), \
+        CHAR_LINE(n, 0x0F), \
+
+        CHAR_LINE(n, 0x00), \
+        CHAR_LINE(n, 0x01), \
+        CHAR_LINE(n, 0x02), \
+        CHAR_LINE(n, 0x03), \
+        CHAR_LINE(n, 0x04), \
+        CHAR_LINE(n, 0x05), \
+        CHAR_LINE(n, 0x06), \
+        CHAR_LINE(n, 0x07), \
+        CHAR_LINE(n, 0x08), \
+        CHAR_LINE(n, 0x09), \
+        CHAR_LINE(n, 0x0A), \
+        CHAR_LINE(n, 0x0B), \
+        CHAR_LINE(n, 0x0C), \
+        CHAR_LINE(n, 0x0D), \
+        CHAR_LINE(n, 0x0E), \
+        CHAR_LINE(n, 0x0F), \
+
+        CHAR_LINE(n, 0x00), \
+        CHAR_LINE(n, 0x01), \
+        CHAR_LINE(n, 0x02), \
+        CHAR_LINE(n, 0x03), \
+        CHAR_LINE(n, 0x04), \
+        CHAR_LINE(n, 0x05), \
+        CHAR_LINE(n, 0x06), \
+        CHAR_LINE(n, 0x07), \
+        CHAR_LINE(n, 0x08), \
+        CHAR_LINE(n, 0x09), \
+        CHAR_LINE(n, 0x0A), \
+        CHAR_LINE(n, 0x0B), \
+        CHAR_LINE(n, 0x0C), \
+        CHAR_LINE(n, 0x0D), \
+        CHAR_LINE(n, 0x0E), \
+        CHAR_LINE(n, 0x0F), \
+
+        CHAR_LINE(n, 0x00), \
+        CHAR_LINE(n, 0x01), \
+        CHAR_LINE(n, 0x02), \
+        CHAR_LINE(n, 0x03), \
+        CHAR_LINE(n, 0x04), \
+        CHAR_LINE(n, 0x05), \
+        CHAR_LINE(n, 0x06), \
+        CHAR_LINE(n, 0x07), \
+        CHAR_LINE(n, 0x08), \
+        CHAR_LINE(n, 0x09), \
+        CHAR_LINE(n, 0x0A), \
+        CHAR_LINE(n, 0x0B), \
+        CHAR_LINE(n, 0x0C), \
+        CHAR_LINE(n, 0x0D), \
+        CHAR_LINE(n, 0x0E), \
+        CHAR_LINE(n, 0x0F), \
+
+        CHAR_LINE(n, 0x00), \
+        CHAR_LINE(n, 0x01), \
+        CHAR_LINE(n, 0x02), \
+        CHAR_LINE(n, 0x03), \
+        CHAR_LINE(n, 0x04), \
+        CHAR_LINE(n, 0x05), \
+        CHAR_LINE(n, 0x06), \
+        CHAR_LINE(n, 0x07), \
+        CHAR_LINE(n, 0x08), \
+        CHAR_LINE(n, 0x09), \
+        CHAR_LINE(n, 0x0A), \
+        CHAR_LINE(n, 0x0B), \
+        CHAR_LINE(n, 0x0C), \
+        CHAR_LINE(n, 0x0D), \
+        CHAR_LINE(n, 0x0E), \
+        CHAR_LINE(n, 0x0F), \
+
+        CHAR_LINE(n, 0x00), \
+        CHAR_LINE(n, 0x01), \
+        CHAR_LINE(n, 0x02), \
+        CHAR_LINE(n, 0x03), \
+        CHAR_LINE(n, 0x04), \
+        CHAR_LINE(n, 0x05), \
+        CHAR_LINE(n, 0x06), \
+        CHAR_LINE(n, 0x07), \
+        CHAR_LINE(n, 0x08), \
+        CHAR_LINE(n, 0x09), \
+        CHAR_LINE(n, 0x0A), \
+        CHAR_LINE(n, 0x0B), \
+        CHAR_LINE(n, 0x0C), \
+        CHAR_LINE(n, 0x0D), \
+        CHAR_LINE(n, 0x0E), \
+        CHAR_LINE(n, 0x0F), \
+
+        CHAR_LINE(n, 0x00), \
+        CHAR_LINE(n, 0x01), \
+        CHAR_LINE(n, 0x02), \
+        CHAR_LINE(n, 0x03), \
+        CHAR_LINE(n, 0x04), \
+        CHAR_LINE(n, 0x05), \
+        CHAR_LINE(n, 0x06), \
+        CHAR_LINE(n, 0x07), \
+        CHAR_LINE(n, 0x08), \
+        CHAR_LINE(n, 0x09), \
+        CHAR_LINE(n, 0x0A), \
+        CHAR_LINE(n, 0x0B), \
+        CHAR_LINE(n, 0x0C), \
+        CHAR_LINE(n, 0x0D), \
+        CHAR_LINE(n, 0x0E), \
+        CHAR_LINE(n, 0x0F), \
+
+        CHAR_LINE(n, 0x00), \
+        CHAR_LINE(n, 0x01), \
+        CHAR_LINE(n, 0x02), \
+        CHAR_LINE(n, 0x03), \
+        CHAR_LINE(n, 0x04), \
+        CHAR_LINE(n, 0x05), \
+        CHAR_LINE(n, 0x06), \
+        CHAR_LINE(n, 0x07), \
+        CHAR_LINE(n, 0x08), \
+        CHAR_LINE(n, 0x09), \
+        CHAR_LINE(n, 0x0A), \
+        CHAR_LINE(n, 0x0B), \
+        CHAR_LINE(n, 0x0C), \
+        CHAR_LINE(n, 0x0D), \
+        CHAR_LINE(n, 0x0E), \
+        CHAR_LINE(n, 0x0F), \
+
+        CHAR_LINE(n, 0x00), \
+        CHAR_LINE(n, 0x01), \
+        CHAR_LINE(n, 0x02), \
+        CHAR_LINE(n, 0x03), \
+        CHAR_LINE(n, 0x04), \
+        CHAR_LINE(n, 0x05), \
+        CHAR_LINE(n, 0x06), \
+        CHAR_LINE(n, 0x07), \
+        CHAR_LINE(n, 0x08), \
+        CHAR_LINE(n, 0x09), \
+        CHAR_LINE(n, 0x0A), \
+        CHAR_LINE(n, 0x0B), \
+        CHAR_LINE(n, 0x0C), \
+        CHAR_LINE(n, 0x0D), \
+        CHAR_LINE(n, 0x0E), \
+        CHAR_LINE(n, 0x0F), \
+
+        CHAR_LINE(n, 0x00), \
+        CHAR_LINE(n, 0x01), \
+        CHAR_LINE(n, 0x02), \
+        CHAR_LINE(n, 0x03), \
+        CHAR_LINE(n, 0x04), \
+        CHAR_LINE(n, 0x05), \
+        CHAR_LINE(n, 0x06), \
+        CHAR_LINE(n, 0x07), \
+        CHAR_LINE(n, 0x08), \
+        CHAR_LINE(n, 0x09), \
+        CHAR_LINE(n, 0x0A), \
+        CHAR_LINE(n, 0x0B), \
+        CHAR_LINE(n, 0x0C), \
+        CHAR_LINE(n, 0x0D), \
+        CHAR_LINE(n, 0x0E), \
+        CHAR_LINE(n, 0x0F), \
+
+        CHAR_LINE(n, 0x00), \
+        CHAR_LINE(n, 0x01), \
+        CHAR_LINE(n, 0x02), \
+        CHAR_LINE(n, 0x03), \
+        CHAR_LINE(n, 0x04), \
+        CHAR_LINE(n, 0x05), \
+        CHAR_LINE(n, 0x06), \
+        CHAR_LINE(n, 0x07), \
+        CHAR_LINE(n, 0x08), \
+        CHAR_LINE(n, 0x09), \
+        CHAR_LINE(n, 0x0A), \
+        CHAR_LINE(n, 0x0B), \
+        CHAR_LINE(n, 0x0C), \
+        CHAR_LINE(n, 0x0D), \
+        CHAR_LINE(n, 0x0E), \
+        CHAR_LINE(n, 0x0F), \
+
+        CHAR_LINE(n, 0x00), \
+        CHAR_LINE(n, 0x01), \
+        CHAR_LINE(n, 0x02), \
+        CHAR_LINE(n, 0x03), \
+        CHAR_LINE(n, 0x04), \
+        CHAR_LINE(n, 0x05), \
+        CHAR_LINE(n, 0x06), \
+        CHAR_LINE(n, 0x07), \
+        CHAR_LINE(n, 0x08), \
+        CHAR_LINE(n, 0x09), \
+        CHAR_LINE(n, 0x0A), \
+        CHAR_LINE(n, 0x0B), \
+        CHAR_LINE(n, 0x0C), \
+        CHAR_LINE(n, 0x0D), \
+        CHAR_LINE(n, 0x0E), \
+        CHAR_LINE(n, 0x0F), \
+
+        CHAR_LINE(n, 0x00), \
+        CHAR_LINE(n, 0x01), \
+        CHAR_LINE(n, 0x02), \
+        CHAR_LINE(n, 0x03), \
+        CHAR_LINE(n, 0x04), \
+        CHAR_LINE(n, 0x05), \
+        CHAR_LINE(n, 0x06), \
+        CHAR_LINE(n, 0x07), \
+        CHAR_LINE(n, 0x08), \
+        CHAR_LINE(n, 0x09), \
+        CHAR_LINE(n, 0x0A), \
+        CHAR_LINE(n, 0x0B), \
+        CHAR_LINE(n, 0x0C), \
+        CHAR_LINE(n, 0x0D), \
+        CHAR_LINE(n, 0x0E), \
+        CHAR_LINE(n, 0x0F), \
+
+        CHAR_LINE(n, 0x00), \
+        CHAR_LINE(n, 0x01), \
+        CHAR_LINE(n, 0x02), \
+        CHAR_LINE(n, 0x03), \
+        CHAR_LINE(n, 0x04), \
+        CHAR_LINE(n, 0x05), \
+        CHAR_LINE(n, 0x06), \
+        CHAR_LINE(n, 0x07), \
+        CHAR_LINE(n, 0x08), \
+        CHAR_LINE(n, 0x09), \
+        CHAR_LINE(n, 0x0A), \
+        CHAR_LINE(n, 0x0B), \
+        CHAR_LINE(n, 0x0C), \
+        CHAR_LINE(n, 0x0D), \
+        CHAR_LINE(n, 0x0E), \
+        CHAR_LINE(n, 0x0F) \
+    }
+
+static const uint8_t characters[8][256] = {
+    CHARSET_LINE(0),
+    CHARSET_LINE(1),
+    CHARSET_LINE(2),
+    CHARSET_LINE(3),
+    CHARSET_LINE(4),
+    CHARSET_LINE(5),
+    CHARSET_LINE(6),
+    CHARSET_LINE(7)
+};
+
 void write_pixels() {
     volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
     volatile uint32_t* set = &VGA_DATA_GPIO->BSHR;
@@ -553,7 +838,7 @@ int main(void) {
                 write_pixels();
             }*/
             if ((current_row >= 0) &&
-                (current_row < 640)) {
+                (current_row < 620)) {
                 waste_time();
                 write_pixels();
             }
