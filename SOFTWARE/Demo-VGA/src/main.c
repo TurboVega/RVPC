@@ -157,14 +157,14 @@ void PWM_Config(TIM_TypeDef *TIM, uint8_t channel, uint16_t pulse, uint16_t mode
 	#define CHECKER_COLUMNS    44
 	#define CHECKER_ROWS       20
 #elif defined SYSCLK_FREQ_6MHZ_HSI
-    #define CLOCK_PRESCALER     4 // 48MHz / 4 = 12MHz
-    #define TICK_CNT_DIVIDER    6 // Converts 36MHz tick counts to 6MHz tick counts
+    #define CLOCK_PRESCALER     2 // 48MHz / 2 = 24MHz
+    #define TICK_CNT_DIVIDER    3 // Converts 36MHz tick counts to 6MHz tick counts
     #define TIMER_OC_MODE       TIM_OCMode_PWM1
 
     #define VGA_HACTIVE_PIXELS 800
-	#define VGA_HBACK_PORCH    ((128)/TICK_CNT_DIVIDER) // 22
-	#define VGA_HSYNC_PERIOD  ((1024)/TICK_CNT_DIVIDER) // 171
-	#define VGA_HSYNC_PULSE     ((72)/TICK_CNT_DIVIDER) // 12
+	//#define VGA_HBACK_PORCH    ((128)/TICK_CNT_DIVIDER)
+	#define VGA_HSYNC_PERIOD  ((1024)/TICK_CNT_DIVIDER)
+	#define VGA_HSYNC_PULSE     ((72)/TICK_CNT_DIVIDER)
 	
     #define VGA_VACTIVE_LINES 600
 	#define VGA_VPERIOD       625
@@ -511,6 +511,9 @@ int main(void) {
 	RCC_HSEConfig(RCC_HSE_OFF);
 	GPIO_PinRemapConfig(GPIO_Remap_PA1_2, DISABLE);
 
+    // HSI clock trim
+    //RCC->CTLR = (RCC->CTLR & ~0xF8) | (4<<3);
+
 	// Remapping
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 
@@ -549,8 +552,8 @@ int main(void) {
                 for (int i = 0; i < 2; i++) waste++;
                 write_pixels();
             }*/
-            if ((current_row >= 300) &&
-                (current_row < 320)) {
+            if ((current_row >= 0) &&
+                (current_row < 640)) {
                 waste_time();
                 write_pixels();
             }
