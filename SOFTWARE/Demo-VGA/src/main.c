@@ -233,274 +233,65 @@ void waste_time() {
 
 }
 
-void write_pixels() {
-    volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
-    volatile uint32_t* set = &VGA_DATA_GPIO->BSHR;
+#define WRITE_PIXEL(ichar, ibit) \
+    do { *out = (char_defs[char_indexes[ichar]] & (1<<ibit)) ? VGA_DATA_PIN : 0; } while (0)
 
-    // 0
-    *set = VGA_DATA_PIN; // 0
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 1
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 2
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 3
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 4
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 5
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 6
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 7
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 8
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 9
-    *set = VGA_DATA_PIN;
+#define WRITE_CHAR(ichar) \
+    do { \
+    WRITE_PIXEL(ichar, 7); \
+    WRITE_PIXEL(ichar, 6); \
+    WRITE_PIXEL(ichar, 5); \
+    WRITE_PIXEL(ichar, 4); \
+    WRITE_PIXEL(ichar, 3); \
+    WRITE_PIXEL(ichar, 2); \
+    WRITE_PIXEL(ichar, 1); \
+    WRITE_PIXEL(ichar, 0); \
+    } while (0)
 
-    // 20
-    *set = VGA_DATA_PIN; // 0
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 1
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 2
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 3
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 4
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 5
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 6
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 7
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 8
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 9
-    *set = VGA_DATA_PIN;
+void write_chars(const uint8_t* char_defs, const uint8_t* char_indexes) {
+    volatile uint8_t* out = &VGA_DATA_GPIO->OUTDR;
 
-    // 40
-    *set = VGA_DATA_PIN; // 0
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 1
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 2
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 3
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 4
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 5
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 6
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 7
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 8
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 9
-    *set = VGA_DATA_PIN;
+    WRITE_CHAR(0);
+    WRITE_CHAR(1);
+    WRITE_CHAR(2);
+    WRITE_CHAR(3);
+    WRITE_CHAR(4);
+    WRITE_CHAR(5);
+    WRITE_CHAR(6);
+    WRITE_CHAR(7);
+    WRITE_CHAR(8);
+    WRITE_CHAR(9);
 
-    // 60
-    *set = VGA_DATA_PIN; // 0
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 1
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 2
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 3
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 4
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 5
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 6
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 7
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 8
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 9
-    *set = VGA_DATA_PIN;
+    WRITE_CHAR(10);
+    WRITE_CHAR(11);
+    WRITE_CHAR(12);
+    WRITE_CHAR(13);
+    WRITE_CHAR(14);
+    WRITE_CHAR(15);
+    WRITE_CHAR(16);
+    WRITE_CHAR(17);
+    WRITE_CHAR(18);
+    WRITE_CHAR(19);
 
-    // 80
-    *set = VGA_DATA_PIN; // 0
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 1
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 2
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 3
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 4
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 5
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 6
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 7
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 8
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 9
-    *set = VGA_DATA_PIN;
+    WRITE_CHAR(20);
+    WRITE_CHAR(21);
+    WRITE_CHAR(22);
+    WRITE_CHAR(23);
+    WRITE_CHAR(24);
+    WRITE_CHAR(25);
+    WRITE_CHAR(26);
+    WRITE_CHAR(27);
+    WRITE_CHAR(28);
+    WRITE_CHAR(29);
+}
 
-    // 100
-    *set = VGA_DATA_PIN; // 0
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 1
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 2
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 3
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 4
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 5
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 6
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 7
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 8
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 9
-    *set = VGA_DATA_PIN;
-
-    // 120
-    *set = VGA_DATA_PIN; // 0
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 1
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 2
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 3
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 4
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 5
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 6
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 7
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 8
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 9
-    *set = VGA_DATA_PIN;
-
-    // 140
-    *set = VGA_DATA_PIN; // 0
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 1
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 2
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 3
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 4
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 5
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 6
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 7
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 8
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 9
-    *set = VGA_DATA_PIN;
-
-    // 160
-    *set = VGA_DATA_PIN; // 0
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 1
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 2
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 3
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 4
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 5
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 6
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 7
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 8
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 9
-    *set = VGA_DATA_PIN;
-
-    // 180
-    *set = VGA_DATA_PIN; // 0
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 1
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 2
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 3
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 4
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 5
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 6
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 7
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 8
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 9
-    *set = VGA_DATA_PIN;
-
-    // 200
-    *set = VGA_DATA_PIN; // 0
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 1
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 2
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 3
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 4
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 5
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 6
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 7
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 8
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 9
-    *set = VGA_DATA_PIN;
-
-    // 220
-    *set = VGA_DATA_PIN; // 0
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 1
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 2
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 3
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 4
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 5
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 6
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 7
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 8
-    *clr = VGA_DATA_PIN;
-    *set = VGA_DATA_PIN; // 9
-    *set = VGA_DATA_PIN;
-
+void init_screen() {
+    uint8_t ch = 0;
+    for (uint8_t row = 0; row < NUM_ROWS; row++) {
+        for (uint8_t col = 0; col < NUM_COLS; col++) {
+            screen_chars[row][col] = ch++;
+        }
+    }
 }
 
 int main(void) {
@@ -543,20 +334,20 @@ int main(void) {
 	TIM_Cmd(VGA_VSYNC_TIM, ENABLE);
 	TIM_Cmd(VGA_HSYNC_TIM, ENABLE);
 
+    // Init screen with test data
+    init_screen();
+
     uint16_t prior_row = VGA_VSYNC_TIM->CNT;
 	while (1) {
         volatile uint16_t current_row = VGA_VSYNC_TIM->CNT;
         if (current_row != prior_row) {
             prior_row = current_row;
-            /*if ((current_row >= VGA_VBACK_PORCH) &&
-                (current_row < VGA_VBACK_PORCH + VGA_VACTIVE_LINES)) {
-                for (int i = 0; i < 2; i++) waste++;
-                write_pixels();
-            }*/
-            if ((current_row >= 0) &&
-                (current_row < 620)) {
+            current_row >>= 1;
+            if (current_row < 312) {
                 waste_time();
-                write_pixels();
+                const uint8_t* char_defs = character_defs[current_row & 0x7];
+                const uint8_t* char_indexes = screen_chars[current_row >> 3];
+                write_chars(char_defs, char_indexes);
             }
             volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
             *clr = VGA_DATA_PIN;

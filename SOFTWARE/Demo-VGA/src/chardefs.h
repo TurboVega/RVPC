@@ -15,8 +15,8 @@
 #include <stdint.h>
 
 // Screen is 30 characters per line, 37 lines.
-#define CHARS_PER_LINE  30
-#define NUM_LINES       37
+#define NUM_COLS        30
+#define NUM_ROWS        39
 #define CHAR_WIDTH       8
 #define CHAR_HEIGHT      8
 
@@ -2643,6 +2643,8 @@
         CHAR_LINE(n, 0xFF) \
     }
 
+// These are the character definitions in ROM (flash memory).
+//
 static const uint8_t character_defs[8][256] = {
     CHARSET_LINE(0),
     CHARSET_LINE(1),
@@ -2653,3 +2655,7 @@ static const uint8_t character_defs[8][256] = {
     CHARSET_LINE(6),
     CHARSET_LINE(7)
 };
+
+// These are the screen characters in RAM (read/write memory).
+//
+static uint8_t screen_chars[NUM_ROWS][NUM_COLS];
