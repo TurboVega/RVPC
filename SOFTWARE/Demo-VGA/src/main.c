@@ -233,25 +233,46 @@ void waste_time() {
 
 }
 
-#define WRITE_PIXEL(ichar, ibit) \
-    do { *out = (char_defs[char_indexes[ichar]] & (1<<ibit)) ? VGA_DATA_PIN : 0; } while (0)
+#define WASTE_5 \
+    *clr = VGA_DATA_PIN; \
+    *clr = VGA_DATA_PIN; \
+    *clr = VGA_DATA_PIN; \
+    *clr = VGA_DATA_PIN; \
+    *clr = VGA_DATA_PIN;
+
+#define WASTE_TIME \
+    WASTE_5; \
+    WASTE_5; \
+    WASTE_5; \
+    WASTE_5; \
+    WASTE_5; \
+    WASTE_5; \
+    WASTE_5; \
+    WASTE_5;
+
+#define WRITE_PIXEL(ibit) \
+    do { \
+        if (chardef & (1<<ibit)) \
+            *set = VGA_DATA_PIN; \
+        else \
+            *clr = VGA_DATA_PIN; \
+    } while (0)
 
 #define WRITE_CHAR(ichar) \
     do { \
-    WRITE_PIXEL(ichar, 7); \
-    WRITE_PIXEL(ichar, 6); \
-    WRITE_PIXEL(ichar, 5); \
-    WRITE_PIXEL(ichar, 4); \
-    WRITE_PIXEL(ichar, 3); \
-    WRITE_PIXEL(ichar, 2); \
-    WRITE_PIXEL(ichar, 1); \
-    WRITE_PIXEL(ichar, 0); \
+    register uint8_t chardef = *pdata++; \
+    WRITE_PIXEL(7); \
+    WRITE_PIXEL(6); \
+    WRITE_PIXEL(5); \
+    WRITE_PIXEL(4); \
+    WRITE_PIXEL(3); \
+    WRITE_PIXEL(2); \
+    WRITE_PIXEL(1); \
+    WRITE_PIXEL(0); \
     } while (0)
 
 void write_chars(const uint8_t* char_defs, const uint8_t* char_indexes) {
-    volatile uint8_t* out = &VGA_DATA_GPIO->OUTDR;
-
-    WRITE_CHAR(0);
+/*
     WRITE_CHAR(1);
     WRITE_CHAR(2);
     WRITE_CHAR(3);
@@ -283,6 +304,7 @@ void write_chars(const uint8_t* char_defs, const uint8_t* char_indexes) {
     WRITE_CHAR(27);
     WRITE_CHAR(28);
     WRITE_CHAR(29);
+*/
 }
 
 void init_screen() {
@@ -293,6 +315,8 @@ void init_screen() {
         }
     }
 }
+
+static uint8_t char_scan_line[NUM_COLS];
 
 int main(void) {
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
@@ -337,19 +361,29 @@ int main(void) {
     // Init screen with test data
     init_screen();
 
+    // Force dummy test data
+    for (int i = 0; i < NUM_COLS; i++) {
+        const uint8_t* char_defs = character_defs;//[current_row & 0x7];
+        const uint8_t* char_indexes = screen_chars[0];//[current_row >> 3];
+        char_scan_line[i] = char_defs[char_indexes[0]];
+    }
+
+    // Draw the screen (character glyphs) repeatedly
+    register volatile uint32_t* set = &VGA_DATA_GPIO->BSHR;
+    register volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
+
     uint16_t prior_row = VGA_VSYNC_TIM->CNT;
 	while (1) {
-        volatile uint16_t current_row = VGA_VSYNC_TIM->CNT;
+        register uint16_t current_row = VGA_VSYNC_TIM->CNT;
         if (current_row != prior_row) {
             prior_row = current_row;
             current_row >>= 1;
-            if (current_row < 312) {
-                waste_time();
-                const uint8_t* char_defs = character_defs[current_row & 0x7];
-                const uint8_t* char_indexes = screen_chars[current_row >> 3];
-                write_chars(char_defs, char_indexes);
+            if (current_row >= 20 && current_row < 280) {
+                WASTE_TIME; WASTE_TIME;
+                //write_chars(char_defs, char_indexes);
+                register const uint8_t* pdata = char_scan_line;
+                WRITE_CHAR(0);
             }
-            volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
             *clr = VGA_DATA_PIN;
         }
 	}
