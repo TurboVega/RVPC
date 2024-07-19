@@ -258,9 +258,9 @@ void waste_time() {
             *clr = VGA_DATA_PIN; \
     } while (0)
 
-#define WRITE_CHAR(ichar) \
+#define WRITE_CHAR(col) \
     do { \
-    register uint8_t chardef = *pdata++; \
+    register uint8_t chardef = pdata[col]; \
     WRITE_PIXEL(7); \
     WRITE_PIXEL(6); \
     WRITE_PIXEL(5); \
@@ -271,8 +271,14 @@ void waste_time() {
     WRITE_PIXEL(0); \
     } while (0)
 
-void write_chars(const uint8_t* char_defs, const uint8_t* char_indexes) {
-/*
+static uint8_t char_scan_line[NUM_COLS];
+
+void write_chars() {
+    register volatile uint32_t* set = &VGA_DATA_GPIO->BSHR;
+    register volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
+    register const uint8_t* pdata = char_scan_line;
+
+    WRITE_CHAR(0);
     WRITE_CHAR(1);
     WRITE_CHAR(2);
     WRITE_CHAR(3);
@@ -304,7 +310,7 @@ void write_chars(const uint8_t* char_defs, const uint8_t* char_indexes) {
     WRITE_CHAR(27);
     WRITE_CHAR(28);
     WRITE_CHAR(29);
-*/
+
 }
 
 void init_screen() {
@@ -316,7 +322,25 @@ void init_screen() {
     }
 }
 
-static uint8_t char_scan_line[NUM_COLS];
+void prepare_scan_line(uint16_t row) {
+    const uint8_t* char_defs = character_defs[row & 0x7];
+    const uint8_t* char_indexes = screen_chars[row >> 3];
+    for (int i = 0; i < NUM_COLS; i++) {
+        char_scan_line[i] = char_defs[char_indexes[i]];
+    }
+}
+
+void on_hblank_start(uint16_t current_row) {
+}
+
+void on_hblank_continue(uint16_t current_row) {
+}
+
+void on_vblank_start() {
+}
+
+void on_vblank_continue() {
+}
 
 int main(void) {
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
@@ -361,15 +385,7 @@ int main(void) {
     // Init screen with test data
     init_screen();
 
-    // Force dummy test data
-    for (int i = 0; i < NUM_COLS; i++) {
-        const uint8_t* char_defs = character_defs[0];//[current_row & 0x7];
-        const uint8_t* char_indexes = screen_chars[0];//[current_row >> 3];
-        char_scan_line[i] = char_defs[char_indexes[0]];
-    }
-
     // Draw the screen (character glyphs) repeatedly
-    register volatile uint32_t* set = &VGA_DATA_GPIO->BSHR;
     register volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
 
     uint16_t prior_row = VGA_VSYNC_TIM->CNT;
@@ -378,13 +394,26 @@ int main(void) {
         if (current_row != prior_row) {
             prior_row = current_row;
             current_row >>= 1;
-            if (current_row >= 20 && current_row < 280) {
-                WASTE_TIME; WASTE_TIME;
-                //write_chars(char_defs, char_indexes);
-                register const uint8_t* pdata = char_scan_line;
-                WRITE_CHAR(0);
+            if (current_row < (VGA_VACTIVE_LINES >> 1)) {
+                WASTE_TIME;
+                write_chars();
+                *clr = VGA_DATA_PIN;
+
+                uint16_t next_row = (prior_row + 1) >> 1;
+                if ((next_row != prior_row) && (next_row < (VGA_VACTIVE_LINES >> 1))) {
+                    prepare_scan_line(next_row);
+                }
+
+                on_hblank_start(current_row);
+            } else if (current_row == (VGA_VACTIVE_LINES >> 1)) {
+                on_vblank_start();
+            } else if (current_row >= (VGA_VPERIOD >> 1)) {
+                prepare_scan_line(0);
+            } else {
+                on_vblank_continue();
             }
-            *clr = VGA_DATA_PIN;
+        } else {
+            on_hblank_continue(current_row);
         }
 	}
 }
