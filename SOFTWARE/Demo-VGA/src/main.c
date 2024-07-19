@@ -363,7 +363,7 @@ int main(void) {
 
     // Force dummy test data
     for (int i = 0; i < NUM_COLS; i++) {
-        const uint8_t* char_defs = character_defs;//[current_row & 0x7];
+        const uint8_t* char_defs = character_defs[0];//[current_row & 0x7];
         const uint8_t* char_indexes = screen_chars[0];//[current_row >> 3];
         char_scan_line[i] = char_defs[char_indexes[0]];
     }
