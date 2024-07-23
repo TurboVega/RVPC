@@ -297,6 +297,13 @@ void init_dynamic_code() {
     dynamic_code.setup_bcr_lo = ((clr & 0x00000FFF) << 20) | 0x00048493;
     dynamic_code.setup_gpio_pin = 0x00403503;
     dynamic_code.ret = 0x8082;
+
+    // to be removed later
+    for (int col = 0; col < NUM_COLS; col++) {
+        for (int bit = 0; bit < 8; bit++) {
+            dynamic_code.write_pix[col*8+bit] = USE_BSHR;//dynamic_code.ret;
+        }
+    }
 }
 
 void on_hblank_start(uint16_t current_row) {
@@ -309,6 +316,19 @@ void on_vblank_start() {
 }
 
 void on_vblank_continue() {
+}
+
+typedef void (*CallDynamic)();
+
+void test() {
+    __asm(" lui x8,0x40011");
+    __asm(" addi x8,x8,0x010");
+    __asm(" lui x9,0x40011");
+    __asm(" addi x9,x9,0x014");
+    __asm(" addi x10,x0,4");
+    __asm(" c.sw x10,0(x8)");
+    __asm(" c.sw x10,0(x9)");
+    __asm(" c.jr x1");
 }
 
 int main(void) {
@@ -358,7 +378,9 @@ int main(void) {
     init_dynamic_code();
 
     // Draw the screen (character glyphs) repeatedly
+    register volatile uint32_t* set = &VGA_DATA_GPIO->BSHR;
     register volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
+    //prepare_scan_line(3*8);
 
     uint16_t prior_row = VGA_VSYNC_TIM->CNT;
 	while (1) {
@@ -368,20 +390,26 @@ int main(void) {
             current_row >>= 1;
             if (current_row < (VGA_VACTIVE_LINES >> 1)) {
                 WASTE_TIME;
-                __asm(" lw x12,dynamic_code");
-                __asm(" c.jalr x12");
+                WASTE_TIME;
+                WASTE_TIME;
+                (*((CallDynamic)(&test)))();
+                //__asm(" lw x12,dynamic_code");
+                //__asm(" c.jalr x12");
+                //*set = VGA_DATA_PIN;
+                //*clr = VGA_DATA_PIN;
+                //*set = VGA_DATA_PIN;
                 *clr = VGA_DATA_PIN;
 
-                uint16_t next_row = (prior_row + 1) >> 1;
+                /*uint16_t next_row = (prior_row + 1) >> 1;
                 if ((next_row != prior_row) && (next_row < (VGA_VACTIVE_LINES >> 1))) {
                     prepare_scan_line(next_row);
-                }
+                }*/
 
                 on_hblank_start(current_row);
             } else if (current_row == (VGA_VACTIVE_LINES >> 1)) {
                 on_vblank_start();
             } else if (current_row >= (VGA_VPERIOD >> 1)) {
-                prepare_scan_line(0);
+                //prepare_scan_line(0);
             } else {
                 on_vblank_continue();
             }
