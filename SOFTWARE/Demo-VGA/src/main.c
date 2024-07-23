@@ -178,61 +178,6 @@ void PWM_Config(TIM_TypeDef *TIM, uint8_t channel, uint16_t pulse, uint16_t mode
 	#define CHECKER_ROWS       10
 #endif
 
-void waste_time() {
-    volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
-
-    // 0
-    *clr = VGA_DATA_PIN; // 0
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 1
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 2
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 3
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 4
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 5
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 6
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 7
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 8
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 9
-    *clr = VGA_DATA_PIN;
-
-    // 20
-    *clr = VGA_DATA_PIN; // 0
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 1
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 2
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 3
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 4
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 5
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 6
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 7
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 8
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 9
-    *clr = VGA_DATA_PIN;
-
-    // 40
-    *clr = VGA_DATA_PIN; // 0
-    *clr = VGA_DATA_PIN;
-    *clr = VGA_DATA_PIN; // 1
-    *clr = VGA_DATA_PIN;
-
-}
-
 #define WASTE_5 \
     *clr = VGA_DATA_PIN; \
     *clr = VGA_DATA_PIN; \
@@ -241,76 +186,97 @@ void waste_time() {
     *clr = VGA_DATA_PIN;
 
 #define WASTE_TIME \
-    WASTE_5; \
-    WASTE_5; \
-    WASTE_5; \
-    WASTE_5; \
-    WASTE_5; \
-    WASTE_5; \
-    WASTE_5; \
-    WASTE_5;
+    switch (current_row & 0x03) { \
+        case 0: { \
+            WASTE_5; \
+            WASTE_5; \
+            WASTE_5; \
+            WASTE_5; \
+            WASTE_5; \
+            WASTE_5; \
+            WASTE_5; \
+            WASTE_5; \
+            break; \
+        } \
+        case 1: { \
+            WASTE_5; \
+            WASTE_5; \
+            WASTE_5; \
+            WASTE_5; \
+            WASTE_5; \
+            WASTE_5; \
+            break; \
+        } \
+        case 2: { \
+            WASTE_5; \
+            WASTE_5; \
+            WASTE_5; \
+            WASTE_5; \
+            break; \
+        } \
+        case 3: { \
+            WASTE_5; \
+            WASTE_5; \
+            break; \
+        } \
+    }
 
-#define WRITE_PIXEL(ibit) \
-    do { \
-        if (chardef & (1<<ibit)) \
-            *set = VGA_DATA_PIN; \
-        else \
-            *clr = VGA_DATA_PIN; \
-    } while (0)
+struct {
+    uint32_t    setup_bshr_hi;      // lui x8,BSHR[31:12]       ; ?????437
+    uint32_t    setup_bshr_lo;      // addi x8,x8,BSHR[11:0]    ; ???40413
+    uint32_t    setup_bcr_hi;       // lui x9,BCR[31:12]        ; ?????4B7
+    uint32_t    setup_bcr_lo;       // addi x9,x9,BCR[11:0]     ; ???48493
+    uint32_t    setup_gpio_pin;     // ld x10,4                 ; 00403503
+    uint16_t    write_pix[30*8];    // c.sw x10,0(x8)           ; C008 uses BSHR
+                                    // c.sw x10,0(x9)           ; C088 uses BCR
+    uint16_t    ret;                // c.jr x1                  ; 8082
+} dynamic_code;
 
-#define WRITE_CHAR(col) \
-    do { \
-    register uint8_t chardef = pdata[col]; \
-    WRITE_PIXEL(7); \
-    WRITE_PIXEL(6); \
-    WRITE_PIXEL(5); \
-    WRITE_PIXEL(4); \
-    WRITE_PIXEL(3); \
-    WRITE_PIXEL(2); \
-    WRITE_PIXEL(1); \
-    WRITE_PIXEL(0); \
-    } while (0)
+#define USE_BSHR    0xC008
+#define USE_BCR     0xC088
 
-static uint8_t char_scan_line[NUM_COLS];
+#define DYN_CODE(index,col1,col2) \
+    chardef = char_defs[char_indexes[col1]]; \
+    instructions[index+0x00] = (chardef & 0x80) ? USE_BSHR : USE_BCR; \
+    instructions[index+0x01] = (chardef & 0x40) ? USE_BSHR : USE_BCR; \
+    instructions[index+0x02] = (chardef & 0x20) ? USE_BSHR : USE_BCR; \
+    instructions[index+0x03] = (chardef & 0x10) ? USE_BSHR : USE_BCR; \
+    instructions[index+0x04] = (chardef & 0x08) ? USE_BSHR : USE_BCR; \
+    instructions[index+0x05] = (chardef & 0x04) ? USE_BSHR : USE_BCR; \
+    instructions[index+0x06] = (chardef & 0x02) ? USE_BSHR : USE_BCR; \
+    instructions[index+0x07] = (chardef & 0x01) ? USE_BSHR : USE_BCR; \
+    \
+    chardef = char_defs[char_indexes[col2]]; \
+    instructions[index+0x08] = (chardef & 0x80) ? USE_BSHR : USE_BCR; \
+    instructions[index+0x09] = (chardef & 0x40) ? USE_BSHR : USE_BCR; \
+    instructions[index+0x0A] = (chardef & 0x20) ? USE_BSHR : USE_BCR; \
+    instructions[index+0x0B] = (chardef & 0x10) ? USE_BSHR : USE_BCR; \
+    instructions[index+0x0C] = (chardef & 0x08) ? USE_BSHR : USE_BCR; \
+    instructions[index+0x0D] = (chardef & 0x04) ? USE_BSHR : USE_BCR; \
+    instructions[index+0x0E] = (chardef & 0x02) ? USE_BSHR : USE_BCR; \
+    instructions[index+0x0F] = (chardef & 0x01) ? USE_BSHR : USE_BCR;
 
-void write_chars() {
-    register volatile uint32_t* set = &VGA_DATA_GPIO->BSHR;
-    register volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
-    register const uint8_t* pdata = char_scan_line;
+void prepare_scan_line(uint16_t row) {
+    register const uint8_t* char_defs = character_defs[row & 0x7];
+    register const uint8_t* char_indexes = screen_chars[row >> 3];
+    register uint16_t* instructions = dynamic_code.write_pix;
 
-    WRITE_CHAR(0);
-    WRITE_CHAR(1);
-    WRITE_CHAR(2);
-    WRITE_CHAR(3);
-    WRITE_CHAR(4);
-    WRITE_CHAR(5);
-    WRITE_CHAR(6);
-    WRITE_CHAR(7);
-    WRITE_CHAR(8);
-    WRITE_CHAR(9);
-
-    WRITE_CHAR(10);
-    WRITE_CHAR(11);
-    WRITE_CHAR(12);
-    WRITE_CHAR(13);
-    WRITE_CHAR(14);
-    WRITE_CHAR(15);
-    WRITE_CHAR(16);
-    WRITE_CHAR(17);
-    WRITE_CHAR(18);
-    WRITE_CHAR(19);
-
-    WRITE_CHAR(20);
-    WRITE_CHAR(21);
-    WRITE_CHAR(22);
-    WRITE_CHAR(23);
-    WRITE_CHAR(24);
-    WRITE_CHAR(25);
-    WRITE_CHAR(26);
-    WRITE_CHAR(27);
-    WRITE_CHAR(28);
-    WRITE_CHAR(29);
-
+    register uint8_t chardef;
+    DYN_CODE(0x00, 0, 1)
+    DYN_CODE(0x10, 2, 3)
+    DYN_CODE(0x20, 4, 5)
+    DYN_CODE(0x30, 6, 7)
+    DYN_CODE(0x40, 8, 9)
+    DYN_CODE(0x50, 10, 11)
+    DYN_CODE(0x60, 12, 13)
+    DYN_CODE(0x70, 14, 15)
+    DYN_CODE(0x80, 16, 17)
+    DYN_CODE(0x90, 18, 19)
+    DYN_CODE(0xA0, 20, 21)
+    DYN_CODE(0xB0, 22, 23)
+    DYN_CODE(0xC0, 24, 25)
+    DYN_CODE(0xD0, 26, 27)
+    DYN_CODE(0xE0, 28, 29)
 }
 
 void init_screen() {
@@ -322,12 +288,15 @@ void init_screen() {
     }
 }
 
-void prepare_scan_line(uint16_t row) {
-    const uint8_t* char_defs = character_defs[row & 0x7];
-    const uint8_t* char_indexes = screen_chars[row >> 3];
-    for (int i = 0; i < NUM_COLS; i++) {
-        char_scan_line[i] = char_defs[char_indexes[i]];
-    }
+void init_dynamic_code() {
+    uint32_t set = (uint32_t)(&VGA_DATA_GPIO->BSHR);
+    uint32_t clr = (uint32_t)(&VGA_DATA_GPIO->BCR);
+    dynamic_code.setup_bshr_hi = (set & 0xFFFFF000) | 0x00000437;
+    dynamic_code.setup_bshr_lo = ((set & 0x00000FFF) << 20) | 0x00040413;
+    dynamic_code.setup_bcr_hi = (clr & 0xFFFFF000) | 0x000004B7;
+    dynamic_code.setup_bcr_lo = ((clr & 0x00000FFF) << 20) | 0x00048493;
+    dynamic_code.setup_gpio_pin = 0x00403503;
+    dynamic_code.ret = 0x8082;
 }
 
 void on_hblank_start(uint16_t current_row) {
@@ -384,6 +353,9 @@ int main(void) {
 
     // Init screen with test data
     init_screen();
+    
+    // Initialize the more static parts of the dynamic code
+    init_dynamic_code();
 
     // Draw the screen (character glyphs) repeatedly
     register volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
@@ -396,7 +368,8 @@ int main(void) {
             current_row >>= 1;
             if (current_row < (VGA_VACTIVE_LINES >> 1)) {
                 WASTE_TIME;
-                write_chars();
+                __asm(" lw x12,dynamic_code");
+                __asm(" c.jalr x12");
                 *clr = VGA_DATA_PIN;
 
                 uint16_t next_row = (prior_row + 1) >> 1;
