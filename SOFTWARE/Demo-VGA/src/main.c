@@ -226,7 +226,7 @@ struct {
     uint32_t    setup_bshr_lo;      // addi x8,x8,BSHR[11:0]    ; ???40413
     uint32_t    setup_bcr_hi;       // lui x9,BCR[31:12]        ; ?????4B7
     uint32_t    setup_bcr_lo;       // addi x9,x9,BCR[11:0]     ; ???48493
-    uint32_t    setup_gpio_pin;     // ld x10,4                 ; 00403503
+    uint32_t    setup_gpio_pin;     // addi x10,x0,4            ; 00400213
     uint16_t    write_pix[30*8];    // c.sw x10,0(x8)           ; C008 uses BSHR
                                     // c.sw x10,0(x9)           ; C088 uses BCR
     uint16_t    ret;                // c.jr x1                  ; 8082
@@ -295,7 +295,7 @@ void init_dynamic_code() {
     dynamic_code.setup_bshr_lo = ((set & 0x00000FFF) << 20) | 0x00040413;
     dynamic_code.setup_bcr_hi = (clr & 0xFFFFF000) | 0x000004B7;
     dynamic_code.setup_bcr_lo = ((clr & 0x00000FFF) << 20) | 0x00048493;
-    dynamic_code.setup_gpio_pin = 0x00403503;
+    dynamic_code.setup_gpio_pin = 0x00400213;
     dynamic_code.ret = 0x8082;
 
     // to be removed later
@@ -320,15 +320,313 @@ void on_vblank_continue() {
 
 typedef void (*CallDynamic)();
 
-void test() {
-    __asm(" lui x8,0x40011");
-    __asm(" addi x8,x8,0x010");
-    __asm(" lui x9,0x40011");
-    __asm(" addi x9,x9,0x014");
-    __asm(" addi x10,x0,4");
-    __asm(" c.sw x10,0(x8)");
-    __asm(" c.sw x10,0(x9)");
-    __asm(" c.jr x1");
+void run_dynamic_code() {
+    __asm(" lui x8,0x40011");   // load upper 20 bits of x8 with BSHR address
+    __asm(" addi x8,x8,0x010"); // load lower 12 bits of x8 with BSHR address
+    __asm(" lui x9,0x40011");   // load upper 20 bits of x9 with BCR address
+    __asm(" addi x9,x9,0x014"); // load lower 12 bits of x9 with BCR address
+    __asm(" addi x10,x0,4");    // load x10 with bit value of video-out
+
+    // 0
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 1
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 2
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 3
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 4
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 5
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 6
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 7
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 8
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 9
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 10
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 11
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 12
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 13
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 14
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 15
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 16
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 17
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 18
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 19
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 20
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 21
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 22
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 23
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 24
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 25
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 26
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 27
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+
+    // 28
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+/*
+    // 29
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
+    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+*/
 }
 
 int main(void) {
@@ -388,16 +686,25 @@ int main(void) {
         if (current_row != prior_row) {
             prior_row = current_row;
             current_row >>= 1;
-            if (current_row < (VGA_VACTIVE_LINES >> 1)) {
-                WASTE_TIME;
-                WASTE_TIME;
-                WASTE_TIME;
-                (*((CallDynamic)(&test)))();
-                //__asm(" lw x12,dynamic_code");
-                //__asm(" c.jalr x12");
-                //*set = VGA_DATA_PIN;
-                //*clr = VGA_DATA_PIN;
-                //*set = VGA_DATA_PIN;
+            uint16_t lo = 36;
+            uint16_t hi = (VGA_VACTIVE_LINES >> 1);
+            if (current_row >= lo && current_row < hi) {
+                //WASTE_TIME;
+                //WASTE_TIME;
+
+                WASTE_5;
+                WASTE_5;
+                WASTE_5;
+                WASTE_5;
+                WASTE_5;
+                WASTE_5;
+                WASTE_5;
+                WASTE_5;
+                WASTE_5;
+                WASTE_5;
+                *clr = VGA_DATA_PIN;
+
+                (*((CallDynamic)(&run_dynamic_code)))();
                 *clr = VGA_DATA_PIN;
 
                 /*uint16_t next_row = (prior_row + 1) >> 1;
