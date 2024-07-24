@@ -267,14 +267,14 @@ void prepare_scan_line(uint16_t row) {
     DYN_CODE(0xB0, 22, 23)
     DYN_CODE(0xC0, 24, 25)
     DYN_CODE(0xD0, 26, 27)
-    DYN_CODE(0xE0, 28, 29)
+    //DYN_CODE(0xE0, 28, 29)
 }
 
 void init_screen() {
-    uint8_t ch = 0;
+    //uint8_t ch = 0;
     for (uint8_t row = 0; row < NUM_ROWS; row++) {
         for (uint8_t col = 0; col < NUM_COLS; col++) {
-            screen_chars[row][col] = ch++;
+            screen_chars[row][col] = 'a';//ch++;
         }
     }
 }
@@ -291,9 +291,7 @@ void on_vblank_start() {
 void on_vblank_continue() {
 }
 
-typedef void (*CallDynamic)();
-
-uint16_t* run_dynamic_code() {
+uint16_t* __attribute__((section(".data"))) run_dynamic_code() {
     __asm(" lui x8,0x40011");   // load upper 20 bits of x8 with BSHR address
     __asm(" addi x8,x8,0x010"); // load lower 12 bits of x8 with BSHR address
     __asm(" lui x9,0x40011");   // load upper 20 bits of x9 with BCR address
@@ -301,8 +299,8 @@ uint16_t* run_dynamic_code() {
     __asm(" addi x10,x0,4");    // load x10 with bit value of video-out
 
 write_pix:
+
     // 0
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
     __asm(" c.sw x10,0(x9)");   // clear video-out bit
     __asm(" c.sw x10,0(x8)");   // set video-out bit
     __asm(" c.sw x10,0(x9)");   // clear video-out bit
@@ -310,6 +308,7 @@ write_pix:
     __asm(" c.sw x10,0(x9)");   // clear video-out bit
     __asm(" c.sw x10,0(x8)");   // set video-out bit
     __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    __asm(" c.sw x10,0(x8)");   // set video-out bit
 
     // 1
     __asm(" c.sw x10,0(x8)");   // set video-out bit
@@ -590,7 +589,6 @@ write_pix:
     __asm(" c.sw x10,0(x9)");   // clear video-out bit
     __asm(" c.sw x10,0(x8)");   // set video-out bit
     __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
 /*
     // 29
     __asm(" c.sw x10,0(x8)");   // set video-out bit
@@ -602,24 +600,34 @@ write_pix:
     __asm(" c.sw x10,0(x8)");   // set video-out bit
     __asm(" c.sw x10,0(x9)");   // clear video-out bit
 */
-    return (uint16_t*) &&write_pix;
+    uint16_t* p = &&write_pix;
+    return p + 10;
 }
 
 void init_dynamic_code() {
     write_pix_instructions = run_dynamic_code();
     uint16_t* write_pix = write_pix_instructions;
-    for (int col = 0; col < 29; col++) {
-        for (int bit = 0; bit < 8; bit+=2) {
-            write_pix[col*8+bit] = USE_BSHR;
-            write_pix[col*8+bit+1] = USE_BCR;
-        }
+    for (int col = 0; col < 1; col++) {
+        write_pix[col*8+0] = USE_BSHR;
+        write_pix[col*8+1] = USE_BCR;
+        write_pix[col*8+2] = USE_BSHR;
+        write_pix[col*8+3] = USE_BCR;
+        write_pix[col*8+4] = USE_BCR;
+        write_pix[col*8+5] = USE_BSHR;
+        write_pix[col*8+6] = USE_BSHR;
+        write_pix[col*8+7] = USE_BCR;
     }
+
+    /*
     for (int col = 29; col < NUM_COLS; col++) {
         for (int bit = 0; bit < 8; bit+=2) {
             write_pix[col*8+bit] = USE_BCR;
             write_pix[col*8+bit+1] = USE_BCR;
         }
     }
+    */
+
+    //prepare_scan_line(6);
 }
 
 int main(void) {
@@ -697,7 +705,12 @@ int main(void) {
                 *clr = VGA_DATA_PIN;
                 *clr = VGA_DATA_PIN;
 
-                (*((CallDynamic)(&run_dynamic_code)))();
+                *clr = VGA_DATA_PIN;
+                *clr = VGA_DATA_PIN;
+                *clr = VGA_DATA_PIN;
+                *clr = VGA_DATA_PIN;
+
+                run_dynamic_code();
                 *clr = VGA_DATA_PIN;
 
                 /*uint16_t next_row = (prior_row + 1) >> 1;
