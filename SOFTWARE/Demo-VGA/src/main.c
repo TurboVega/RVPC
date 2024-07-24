@@ -607,7 +607,7 @@ write_pix:
 void init_dynamic_code() {
     write_pix_instructions = run_dynamic_code();
     uint16_t* write_pix = write_pix_instructions;
-    for (int col = 0; col < 1; col++) {
+    for (int col = 0; col < 29; col++) {
         write_pix[col*8+0] = USE_BSHR;
         write_pix[col*8+1] = USE_BCR;
         write_pix[col*8+2] = USE_BSHR;
