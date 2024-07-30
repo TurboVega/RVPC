@@ -55,6 +55,16 @@ void on_vblank_continue();
 #define USE_BSHR    0xC008
 #define USE_BCR     0xC088
 
+#define REG_BSHR            x8   /* (s0) points to GPIO BSHR register */
+#define REG_BCR             x9   /* (s1) points to GPIO BCR register */
+#define REG_VIDEO_OUT       x20  /* (s4) bit value of video-out pin */
+#define REG_DYN_CODE        x21  /* (s5) points to dynamic code array */
+#define REG_CHAR_DEF_LINE   x22  /* (s6) points to character definition line */
+#define REG_TEXT_CHAR_ARRAY x23  /* (s7) points to text character array */
+#define REG_PRIOR_LINE      x24  /* (s8) prior scan line index */
+#define REG_CURRENT_LINE    x25  /* (s9) current scan line index */
+#define REG_CHAR_DEF_BITS   x28  /* (t3) character definition bits */
+
 #define DYN_CODE(index,col1,col2) \
     chardef = char_defs[char_indexes[col1]]; \
     instructions[index+0x00] = (chardef & 0x80) ? USE_BSHR : USE_BCR; \
@@ -101,6 +111,19 @@ void prepare_scan_line(uint16_t row) {
     //DYN_CODE(0xE0, 28, 29)
 }
 
+#define ASM_CLR_VIDEO   __asm(" c.sw x10,0(x9)"); /* clear video-out bit */
+#define ASM_SET_VIDEO   __asm(" c.sw x10,0(x8)"); /* set video-out bit */
+
+#define WRITE_VIDEO_8 \
+    ASM_CLR_VIDEO \
+    ASM_SET_VIDEO \
+    ASM_CLR_VIDEO \
+    ASM_SET_VIDEO \
+    ASM_CLR_VIDEO \
+    ASM_SET_VIDEO \
+    ASM_CLR_VIDEO \
+    ASM_SET_VIDEO
+
 uint16_t* __attribute__((section(".data"))) run_dynamic_code() {
     __asm(" lui x8,0x40011");   // load upper 20 bits of x8 with BSHR address
     __asm(" addi x8,x8,0x010"); // load lower 12 bits of x8 with BSHR address
@@ -110,305 +133,37 @@ uint16_t* __attribute__((section(".data"))) run_dynamic_code() {
 
 write_pix:
 
-    // 0
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-
-    // 1
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 2
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 3
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 4
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 5
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 6
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 7
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 8
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 9
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 10
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 11
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 12
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 13
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 14
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 15
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 16
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 17
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 18
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 19
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 20
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 21
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 22
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 23
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 24
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 25
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 26
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 27
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-
-    // 28
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    WRITE_VIDEO_8 // 0
+    WRITE_VIDEO_8 // 1
+    WRITE_VIDEO_8 // 2
+    WRITE_VIDEO_8 // 3
+    WRITE_VIDEO_8 // 4
+    WRITE_VIDEO_8 // 5
+    WRITE_VIDEO_8 // 6
+    WRITE_VIDEO_8 // 7
+    WRITE_VIDEO_8 // 8
+    WRITE_VIDEO_8 // 9
+    WRITE_VIDEO_8 // 10
+    WRITE_VIDEO_8 // 11
+    WRITE_VIDEO_8 // 12
+    WRITE_VIDEO_8 // 13
+    WRITE_VIDEO_8 // 14
+    WRITE_VIDEO_8 // 15
+    WRITE_VIDEO_8 // 16
+    WRITE_VIDEO_8 // 17
+    WRITE_VIDEO_8 // 18
+    WRITE_VIDEO_8 // 19
+    WRITE_VIDEO_8 // 20
+    WRITE_VIDEO_8 // 21
+    WRITE_VIDEO_8 // 22
+    WRITE_VIDEO_8 // 23
+    WRITE_VIDEO_8 // 24
+    WRITE_VIDEO_8 // 25
+    WRITE_VIDEO_8 // 26
+    WRITE_VIDEO_8 // 27
+    WRITE_VIDEO_8 // 28
 /*
-    // 29
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
-    __asm(" c.sw x10,0(x8)");   // set video-out bit
-    __asm(" c.sw x10,0(x9)");   // clear video-out bit
+    WRITE_VIDEO_8 // 29
 */
     uint16_t* p = &&write_pix;
     return p + 10; // skip first 5 WORD instructions
