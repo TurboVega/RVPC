@@ -55,15 +55,24 @@ void on_vblank_continue();
 #define USE_BSHR    0xC008
 #define USE_BCR     0xC088
 
-#define REG_BSHR            x8   /* (s0) points to GPIO BSHR register */
-#define REG_BCR             x9   /* (s1) points to GPIO BCR register */
-#define REG_VIDEO_OUT       x20  /* (s4) bit value of video-out pin */
-#define REG_DYN_CODE        x21  /* (s5) points to dynamic code array */
-#define REG_CHAR_DEF_LINE   x22  /* (s6) points to character definition line */
-#define REG_TEXT_CHAR_ARRAY x23  /* (s7) points to text character array */
-#define REG_PRIOR_LINE      x24  /* (s8) prior scan line index */
-#define REG_CURRENT_LINE    x25  /* (s9) current scan line index */
-#define REG_CHAR_DEF_BITS   x28  /* (t3) character definition bits */
+// (s0) points to GPIO BSHR register
+#define REG_BSHR            x8
+// (s1) points to GPIO BCR register
+#define REG_BCR             x9 
+// (s4) bit value of video-out pin
+#define REG_VIDEO_OUT       x20
+// (s5) points to dynamic code array
+#define REG_DYN_CODE        x21
+// (s6) points to character definition line
+#define REG_CHAR_DEF_LINE   x22
+// (s7) points to text character array
+#define REG_TEXT_CHAR_ARRAY x23
+// (s8) prior scan line index
+#define REG_PRIOR_LINE      x24
+// (s9) current scan line index
+#define REG_CURRENT_LINE    x25
+// (t3) character definition bits
+#define REG_CHAR_DEF_BITS   x28
 
 #define DYN_CODE(index,col1,col2) \
     chardef = char_defs[char_indexes[col1]]; \
@@ -111,8 +120,8 @@ void prepare_scan_line(uint16_t row) {
     //DYN_CODE(0xE0, 28, 29)
 }
 
-#define ASM_CLR_VIDEO   __asm(" c.sw x10,0(x9)"); /* clear video-out bit */
-#define ASM_SET_VIDEO   __asm(" c.sw x10,0(x8)"); /* set video-out bit */
+#define ASM_CLR_VIDEO   __asm(" c.sw REG_VIDEO_OUT,0(REG_BCR)"); /* clear video-out bit */
+#define ASM_SET_VIDEO   __asm(" c.sw REG_VIDEO_OUT,0(REG_BSHR)"); /* set video-out bit */
 
 #define WRITE_VIDEO_8 \
     ASM_CLR_VIDEO \
@@ -125,11 +134,11 @@ void prepare_scan_line(uint16_t row) {
     ASM_SET_VIDEO
 
 uint16_t* __attribute__((section(".data"))) run_dynamic_code() {
-    __asm(" lui x8,0x40011");   // load upper 20 bits of x8 with BSHR address
-    __asm(" addi x8,x8,0x010"); // load lower 12 bits of x8 with BSHR address
-    __asm(" lui x9,0x40011");   // load upper 20 bits of x9 with BCR address
-    __asm(" addi x9,x9,0x014"); // load lower 12 bits of x9 with BCR address
-    __asm(" addi x10,x0,4");    // load x10 with bit value of video-out
+    __asm(" lui REG_BSHR,0x40011");         // load upper 20 bits of x8 with BSHR address
+    __asm(" addi REG_BSHR,REG_BSHR,0x010"); // load lower 12 bits of x8 with BSHR address
+    __asm(" lui REG_BCR,0x40011");          // load upper 20 bits of x9 with BCR address
+    __asm(" addi REG_BCR,REG_BCR,0x014");   // load lower 12 bits of x9 with BCR address
+    __asm(" addi REG_VIDEO_OUT,x0,4");      // load x20 with bit value of video-out
 
 write_pix:
 
@@ -169,38 +178,12 @@ write_pix:
     return p + 10; // skip first 5 WORD instructions
 }
 
-void init_dynamic_code() {
-    write_pix_instructions = run_dynamic_code();
-    uint16_t* write_pix = write_pix_instructions;
-    for (int col = 0; col < 29; col++) {
-        write_pix[col*8+0] = USE_BSHR;
-        write_pix[col*8+1] = USE_BCR;
-        write_pix[col*8+2] = USE_BSHR;
-        write_pix[col*8+3] = USE_BCR;
-        write_pix[col*8+4] = USE_BCR;
-        write_pix[col*8+5] = USE_BSHR;
-        write_pix[col*8+6] = USE_BSHR;
-        write_pix[col*8+7] = USE_BCR;
-    }
-
-    /*
-    for (int col = 29; col < NUM_COLS; col++) {
-        for (int bit = 0; bit < 8; bit+=2) {
-            write_pix[col*8+bit] = USE_BCR;
-            write_pix[col*8+bit+1] = USE_BCR;
-        }
-    }
-    */
-
-    //prepare_scan_line(6);
-}
-
 void run_video_loop() {
     // Init screen with test data
     init_screen();
     
-    // Initialize the more static parts of the dynamic code
-    init_dynamic_code();
+    // Save the address of the dynamic code
+    write_pix_instructions = run_dynamic_code();
 
     // Draw the screen (character glyphs) repeatedly
     register volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
