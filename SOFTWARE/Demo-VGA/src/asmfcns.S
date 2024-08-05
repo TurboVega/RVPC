@@ -5,11 +5,6 @@
 // License: Apache
 //
 
-    .section .text
-    .align 4
-
-    .global   set_dynamic_code
-
 #define USE_BSHR    0xC01C  /* c.sw x15,0(x8)   store video-out bit into GPIO BSHR */
 #define USE_BCR     0xC09C  /* c.sw x15,0(x9)   store video-out bit into GPIO BCR */
 
@@ -47,6 +42,67 @@
 // t5 x30
 // t6 x31
 
+//-----------------------------------------------------------
+
+    .section .data
+    .align 4
+
+    .global   run_dynamic_code
+
+    .macro PIX_PAIR
+    c.sw x15,0(x8)      // set a pixel
+    c.sw x15,0(x9)      // clear a pixel
+    .endm
+
+    .macro WRITE_VIDEO_8
+    PIX_PAIR
+    PIX_PAIR
+    PIX_PAIR
+    PIX_PAIR
+    .endm
+
+run_dynamic_code:
+
+    WRITE_VIDEO_8 // 0
+    WRITE_VIDEO_8 // 1
+    WRITE_VIDEO_8 // 2
+    WRITE_VIDEO_8 // 3
+    WRITE_VIDEO_8 // 4
+    WRITE_VIDEO_8 // 5
+    WRITE_VIDEO_8 // 6
+    WRITE_VIDEO_8 // 7
+    WRITE_VIDEO_8 // 8
+    WRITE_VIDEO_8 // 9
+    WRITE_VIDEO_8 // 10
+    WRITE_VIDEO_8 // 11
+    WRITE_VIDEO_8 // 12
+    WRITE_VIDEO_8 // 13
+    WRITE_VIDEO_8 // 14
+    WRITE_VIDEO_8 // 15
+    WRITE_VIDEO_8 // 16
+    WRITE_VIDEO_8 // 17
+    WRITE_VIDEO_8 // 18
+    WRITE_VIDEO_8 // 19
+    WRITE_VIDEO_8 // 20
+    WRITE_VIDEO_8 // 21
+    WRITE_VIDEO_8 // 22
+    WRITE_VIDEO_8 // 23
+    WRITE_VIDEO_8 // 24
+    WRITE_VIDEO_8 // 25
+    WRITE_VIDEO_8 // 26
+    WRITE_VIDEO_8 // 27
+    WRITE_VIDEO_8 // 28
+    WRITE_VIDEO_8 // 29
+
+    c.jr x1             // return from subroutine
+
+//-----------------------------------------------------------
+
+    .section .text
+    .align 4
+
+    .global   set_dynamic_code
+
     .macro PX00
     c.sw x10,0(x14)     // clear 1st pixel and 2nd pixel
     .endm
@@ -67,11 +123,8 @@
     c.jr x1             // return from subroutine
     .endm
 
-// The following are 256 separate subroutines, each of which has
-// the same type signature:
-//
-// void set_dynamic_code(ram_code_address, bshr_instr, bcr_instr);
-//
+// The following are 256 separate subroutines, each of which generates
+// code that is later called to write pixel data to the GPIO.
 // The caller must call the correct function according to the character
 // glyph scan line contents (i.e., the 8-bit value of the pixel arrangement
 // in a single scan line of a single character glyph).
