@@ -63,6 +63,12 @@
 
 run_dynamic_code:
 
+    lui     x8,0x40011           // load upper 20 bits of x8 with BSHR address
+    addi    x8,x8,0x010          // load lower 12 bits of x8 with BSHR address
+    lui     x9,0x40011           // load upper 20 bits of x9 with BCR address
+    addi    x9,x9,0x014          // load lower 12 bits of x9 with BCR address
+    addi    x15,x0,4             // load x15 with bit value of video-out
+
     WRITE_VIDEO_8 // 0
     WRITE_VIDEO_8 // 1
     WRITE_VIDEO_8 // 2
@@ -78,7 +84,7 @@ run_dynamic_code:
     WRITE_VIDEO_8 // 12
     WRITE_VIDEO_8 // 13
     WRITE_VIDEO_8 // 14
-    WRITE_VIDEO_8 // 15
+    /*WRITE_VIDEO_8 // 15
     WRITE_VIDEO_8 // 16
     WRITE_VIDEO_8 // 17
     WRITE_VIDEO_8 // 18
@@ -92,7 +98,8 @@ run_dynamic_code:
     WRITE_VIDEO_8 // 26
     WRITE_VIDEO_8 // 27
     WRITE_VIDEO_8 // 28
-    WRITE_VIDEO_8 // 29
+    */
+    //WRITE_VIDEO_8 // 29
 
     c.jr x1             // return from subroutine
 

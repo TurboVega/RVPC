@@ -11,7 +11,7 @@ extern void on_vblank_continue();
 
 void waste_time() {
     int i;
-    for (i = 0; i < 100; i++) {
+    for (i = 0; i < 170; i++) {
         VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
     }
 }
@@ -26,20 +26,7 @@ extern void run_dynamic_code();
 void run_video_loop() {
     // Init screen with test data
     init_screen();
-/*    
-    __asm(
-    "       la      x11,run_dynamic_code\n" // load x11 with address of dynamic code
-    "       lui     x8,0x40011\n"           // load upper 20 bits of x8 with BSHR address
-    "       addi    x8,x8,0x010\n"          // load lower 12 bits of x8 with BSHR address
-    "       lui     x9,0x40011\n"           // load upper 20 bits of x9 with BCR address
-    "       addi    x9,x9,0x014\n"          // load lower 12 bits of x9 with BCR address
-    "       lui     x12,0x40012\n"          // load upper 20 bits of x12 with TIM1->CNT address
-    "       addi    x12,x12,0xC24\n"        // load lower 12 bits of x12 with TIM1->CNT address
-    "       addi    x10,x0,4\n"             // load x10 with bit value of video-out
-    "       mov     x22,x0\n"               // clear prior row index
-    "       mov     x23,x0\n"               // clear current row index
-    );
-*/
+
     uint16_t prior_row = VGA_VSYNC_TIM->CNT;
 	while (1) {
         register uint16_t current_row = VGA_VSYNC_TIM->CNT;
