@@ -3,11 +3,11 @@
 #define DEF_SCREEN_ARRAYS 1
 #include "chardefs.h"
 
-void init_screen();
-void on_hblank_start(uint16_t current_row);
-void on_hblank_continue(uint16_t current_row);
-void on_vblank_start();
-void on_vblank_continue();
+extern void init_screen();
+extern void on_hblank_start(uint16_t current_row);
+extern void on_hblank_continue(uint16_t current_row);
+extern void on_vblank_start();
+extern void on_vblank_continue();
 
 #define WASTE_5 \
     *clr = VGA_DATA_PIN; \
@@ -155,7 +155,7 @@ write_pix:
 void run_video_loop() {
     // Init screen with test data
     init_screen();
-    
+/*    
     __asm(
     "       la      x11,run_dynamic_code\n" // load x11 with address of dynamic code
     "       lui     x8,0x40011\n"           // load upper 20 bits of x8 with BSHR address
@@ -168,7 +168,7 @@ void run_video_loop() {
     "       mov     x22,x0\n"               // clear prior row index
     "       mov     x23,x0\n"               // clear current row index
     );
-
+*/
 /*
     uint16_t prior_row = VGA_VSYNC_TIM->CNT;
 	while (1) {
