@@ -48,6 +48,7 @@
     .align 4
 
     .global   run_dynamic_code
+    .global   write_pixels
 
     .macro PIX_PAIR
     c.sw x15,0(x8)      // set a pixel
@@ -69,6 +70,7 @@ run_dynamic_code:
     addi    x9,x9,0x014          // load lower 12 bits of x9 with BCR address
     addi    x15,x0,4             // load x15 with bit value of video-out
 
+write_pixels:
     WRITE_VIDEO_8 // 0
     WRITE_VIDEO_8 // 1
     WRITE_VIDEO_8 // 2
@@ -84,7 +86,7 @@ run_dynamic_code:
     WRITE_VIDEO_8 // 12
     WRITE_VIDEO_8 // 13
     WRITE_VIDEO_8 // 14
-    /*WRITE_VIDEO_8 // 15
+    WRITE_VIDEO_8 // 15
     WRITE_VIDEO_8 // 16
     WRITE_VIDEO_8 // 17
     WRITE_VIDEO_8 // 18
@@ -92,13 +94,12 @@ run_dynamic_code:
     WRITE_VIDEO_8 // 20
     WRITE_VIDEO_8 // 21
     WRITE_VIDEO_8 // 22
-    WRITE_VIDEO_8 // 23
-    WRITE_VIDEO_8 // 24
-    WRITE_VIDEO_8 // 25
-    WRITE_VIDEO_8 // 26
-    WRITE_VIDEO_8 // 27
-    WRITE_VIDEO_8 // 28
-    */
+    //WRITE_VIDEO_8 // 23
+    //WRITE_VIDEO_8 // 24
+    //WRITE_VIDEO_8 // 25
+    //WRITE_VIDEO_8 // 26
+    //WRITE_VIDEO_8 // 27
+    //WRITE_VIDEO_8 // 28
     //WRITE_VIDEO_8 // 29
 
     c.jr x1             // return from subroutine

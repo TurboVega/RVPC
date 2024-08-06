@@ -1,7 +1,7 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-#define VGA_DATA_GPIO   GPIOC
+#define VGA_DATA_GPIO   ((volatile GPIO_TypeDef *)GPIOC_BASE)
 #define VGA_DATA_PIN    GPIO_Pin_2
 
 #define VGA_HSYNC_GPIO  GPIOC
@@ -11,7 +11,7 @@
 
 #define VGA_VSYNC_GPIO  GPIOA
 #define VGA_VSYNC_PIN   GPIO_Pin_1
-#define VGA_VSYNC_TIM   TIM1
+#define VGA_VSYNC_TIM   ((volatile TIM_TypeDef *)TIM1_BASE)
 #define VGA_VSYNC_CH    2
 
 #ifdef SYSCLK_FREQ_24MHZ_HSI
