@@ -218,6 +218,8 @@ void TIM1_IRQHandler(void) {
 	TIM_ClearITPendingBit(TIM1, TIM_IT_Update); 
 }
 
+extern void run_dynamic_code();
+
 void TIM2_IRQHandler(void)   __attribute__((interrupt("WCH-Interrupt-fast")));
 void TIM2_IRQHandler(void) {
 	static volatile uint32_t current_row = 0;
@@ -235,10 +237,13 @@ void TIM2_IRQHandler(void) {
 	}
 
 	// Stupid delay
-	for (uint8_t p=0; p < VGA_HBACK_PORCH; p++) {
+    uint8_t wait_cnt = 19;
+	for (uint8_t p=0; p < wait_cnt; p++) {
 		hback_porch = hback_porch ^ 1;
 	}
 
+    run_dynamic_code();
+    /*
 	GPIO_WriteBit(VGA_DATA_GPIO, VGA_DATA_PIN, data);
 	for (uint8_t c=0; c < (CHECKER_COLUMNS - 1); c++) {
 		data = data ^ 1;
@@ -252,6 +257,7 @@ void TIM2_IRQHandler(void) {
 		data_start = data_start ^ 1;
 	}
 	data = data_start;
+    */
 exit:
 	GPIO_WriteBit(VGA_DATA_GPIO, VGA_DATA_PIN, 0);
 	TIM_ClearITPendingBit(TIM2, TIM_IT_Update); 
