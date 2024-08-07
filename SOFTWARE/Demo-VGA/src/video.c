@@ -11,10 +11,12 @@ extern void on_vblank_continue();
 
 
 void waste_time(uint16_t row) {
-    static const uint16_t counts[4] = { 50, 52, 60, 62 }; 
+//    static const uint16_t counts[4] = { 200, 200, 200, 200 }; 
     uint16_t i;
-    for (i = 0; i < counts[row&3]; i++) {
-        VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
+    volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
+//    for (i = 0; i < counts[row&3]; i++) {
+    for (i = 0; i < 180; i++) {
+        *clr = VGA_DATA_PIN;
     }
 }
 

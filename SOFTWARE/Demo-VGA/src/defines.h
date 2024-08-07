@@ -43,7 +43,7 @@
 	#define VGA_VBACK_PORCH    12
 	#define VGA_VFRONT_PORCH   10
 #elif defined SYSCLK_FREQ_36MHZ_HSI
-    #define CLOCK_PRESCALER     4 // 48MHz / 4 = 12MHz
+    #define CLOCK_PRESCALER     2 // 48MHz / 2 = 24MHz
     #define TICK_CNT_DIVIDER    3 // Converts 36MHz tick counts to 12MHz tick counts
     #define TIMER_OC_MODE       TIM_OCMode_PWM1
 
