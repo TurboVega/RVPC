@@ -82,18 +82,18 @@ write_pixels:
     WRITE_VIDEO_8 // 8
     WRITE_VIDEO_8 // 9
     WRITE_VIDEO_8 // 10
-    WRITE_VIDEO_8 // 11
-    WRITE_VIDEO_8 // 12
-    WRITE_VIDEO_8 // 13
-    WRITE_VIDEO_8 // 14
-    WRITE_VIDEO_8 // 15
-    WRITE_VIDEO_8 // 16
-    WRITE_VIDEO_8 // 17
-    WRITE_VIDEO_8 // 18
-    WRITE_VIDEO_8 // 19
-    WRITE_VIDEO_8 // 20
-    WRITE_VIDEO_8 // 21
-    WRITE_VIDEO_8 // 22
+    //WRITE_VIDEO_8 // 11
+    //WRITE_VIDEO_8 // 12
+    //WRITE_VIDEO_8 // 13
+    //WRITE_VIDEO_8 // 14
+    //WRITE_VIDEO_8 // 15
+    //WRITE_VIDEO_8 // 16
+    //WRITE_VIDEO_8 // 17
+    //WRITE_VIDEO_8 // 18
+    //WRITE_VIDEO_8 // 19
+    //WRITE_VIDEO_8 // 20
+    //WRITE_VIDEO_8 // 21
+    //WRITE_VIDEO_8 // 22
     //WRITE_VIDEO_8 // 23
     //WRITE_VIDEO_8 // 24
     //WRITE_VIDEO_8 // 25

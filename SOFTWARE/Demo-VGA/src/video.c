@@ -11,11 +11,11 @@ extern void on_vblank_continue();
 
 
 void waste_time(uint16_t row) {
-//    static const uint16_t counts[4] = { 200, 200, 200, 200 }; 
+    static const uint16_t counts[4] = { 180, 181, 182, 183 }; 
     uint16_t i;
+    uint16_t limit = counts[row&3];
     volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
-//    for (i = 0; i < counts[row&3]; i++) {
-    for (i = 0; i < 180; i++) {
+    for (i = 0; i < limit; i++) {
         *clr = VGA_DATA_PIN;
     }
 }
@@ -36,24 +36,25 @@ void run_video_loop() {
         register uint16_t current_row = VGA_VSYNC_TIM->CNT;
         if (current_row != prior_row) {
             prior_row = current_row;
-            current_row >>= 1;
             uint16_t lo = 16;
-            uint16_t hi = 64;//(VGA_VACTIVE_LINES >> 1);
+            uint16_t hi = VGA_VACTIVE_LINES;
             if (current_row >= lo && current_row < hi) {
-                waste_time(prior_row);
+                waste_time(current_row);
 
                 run_dynamic_code();
                 VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
 
-                uint16_t next_row = (prior_row + 1) >> 1;
-                if ((next_row != current_row) && (next_row < (VGA_VACTIVE_LINES >> 1))) {
+                uint16_t next_row = current_row + 1;
+                if (next_row < (VGA_VACTIVE_LINES)) {
                     prepare_scan_line(next_row);
                 }
 
                 on_hblank_start(current_row);
-            } else if (current_row == (VGA_VACTIVE_LINES >> 1)) {
+            } else if (current_row < (VGA_VACTIVE_LINES)) {
+                on_hblank_start(current_row);
+            } else if (current_row == (VGA_VACTIVE_LINES)) {
                 on_vblank_start();
-            } else if (current_row >= (VGA_VPERIOD >> 1)) {
+            } else if (current_row >= (VGA_VPERIOD-1)) {
                 prepare_scan_line(0);
             } else {
                 on_vblank_continue();
