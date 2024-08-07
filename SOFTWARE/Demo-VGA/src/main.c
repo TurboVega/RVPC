@@ -219,45 +219,28 @@ void TIM1_IRQHandler(void) {
 }
 
 extern void run_dynamic_code();
+extern void waste_time0();
+extern void waste_time1();
 
 void TIM2_IRQHandler(void)   __attribute__((interrupt("WCH-Interrupt-fast")));
 void TIM2_IRQHandler(void) {
 	static volatile uint32_t current_row = 0;
 	static volatile uint8_t hback_porch = 0;
-	static volatile uint8_t data = 1;
-	static volatile uint8_t checker = 0;
-	static volatile uint8_t data_start = 1;
 
 	current_row = VGA_VSYNC_TIM->CNT;
 	if (current_row <= VGA_VBACK_PORCH || current_row >= (VGA_VPERIOD - VGA_VFRONT_PORCH)) {
-		checker = 0;
-		data_start = 1;
-		data = 1;
 		goto exit;
 	}
 
 	// Stupid delay
-    uint8_t wait_cnt = 19;
-	for (uint8_t p=0; p < wait_cnt; p++) {
-		hback_porch = hback_porch ^ 1;
-	}
+    if (current_row & 1) {
+        waste_time1();
+    } else {
+        waste_time0();
+    }
 
     run_dynamic_code();
-    /*
-	GPIO_WriteBit(VGA_DATA_GPIO, VGA_DATA_PIN, data);
-	for (uint8_t c=0; c < (CHECKER_COLUMNS - 1); c++) {
-		data = data ^ 1;
-		GPIO_WriteBit(VGA_DATA_GPIO, VGA_DATA_PIN, data);
-	}
-	GPIO_WriteBit(VGA_DATA_GPIO, VGA_DATA_PIN, 0);
 
-	checker++;
-	if (checker > CHECKER_ROWS) {
-		checker = 0;
-		data_start = data_start ^ 1;
-	}
-	data = data_start;
-    */
 exit:
 	GPIO_WriteBit(VGA_DATA_GPIO, VGA_DATA_PIN, 0);
 	TIM_ClearITPendingBit(TIM2, TIM_IT_Update); 

@@ -1988,3 +1988,24 @@ set_dynamic_code:
     PX11
     PX11
     RT
+
+//-----------------------------------------------------------
+
+    .align  4
+
+    .global waste_time0
+    .global waste_time1
+
+waste_time1:
+
+    nop                 // delay 1 instruction and fall thru
+
+waste_time0:
+
+    addi    x8,x0,1000  // load delay loop count
+
+waste_loop:
+
+    addi    x8,x8,-1    // decrease count
+    c.jnz   waste_loop  // back if more delay
+    c.jr    x1          // return from subroutine
