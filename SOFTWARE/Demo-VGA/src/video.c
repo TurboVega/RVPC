@@ -11,7 +11,7 @@ extern void on_vblank_continue();
 
 
 void waste_time(uint16_t row) {
-    static const uint16_t counts[4] = { 150, 152, 60, 62 }; 
+    static const uint16_t counts[4] = { 50, 52, 60, 62 }; 
     uint16_t i;
     for (i = 0; i < counts[row&3]; i++) {
         VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
@@ -36,7 +36,7 @@ void run_video_loop() {
             prior_row = current_row;
             current_row >>= 1;
             uint16_t lo = 16;
-            uint16_t hi = 17;//(VGA_VACTIVE_LINES >> 1);
+            uint16_t hi = 64;//(VGA_VACTIVE_LINES >> 1);
             if (current_row >= lo && current_row < hi) {
                 waste_time(prior_row);
 
