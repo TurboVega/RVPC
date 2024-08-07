@@ -11,7 +11,7 @@ extern void on_vblank_continue();
 
 
 void waste_time(uint16_t row) {
-    static const uint16_t counts[4] = { 180, 181, 182, 183 }; 
+    static const uint16_t counts[4] = { 180, 160, 182, 183 }; 
     uint16_t i;
     uint16_t limit = counts[row&3];
     volatile uint32_t* clr = &VGA_DATA_GPIO->BCR;
