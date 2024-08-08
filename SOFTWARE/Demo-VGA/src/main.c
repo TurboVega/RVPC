@@ -154,6 +154,8 @@ void PWM_Config(TIM_TypeDef *TIM, uint8_t channel, uint16_t pulse, uint16_t mode
 	#define CHECKER_ROWS       20
 #endif
 
+static uint16_t must_draw;
+
 int main(void) {
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
 	SystemCoreClockUpdate();
@@ -225,7 +227,6 @@ extern void waste_time1();
 void TIM2_IRQHandler(void)   __attribute__((interrupt("WCH-Interrupt-fast")));
 void TIM2_IRQHandler(void) {
 	static volatile uint32_t current_row = 0;
-	static volatile uint8_t hback_porch = 0;
 
 	current_row = VGA_VSYNC_TIM->CNT;
 	if (current_row <= VGA_VBACK_PORCH || current_row >= (VGA_VPERIOD - VGA_VFRONT_PORCH)) {
@@ -233,11 +234,12 @@ void TIM2_IRQHandler(void) {
 	}
 
 	// Stupid delay
-    if (current_row & 1) {
+    waste_time0();
+    /*if (current_row & 1) {
         waste_time1();
     } else {
         waste_time0();
-    }
+    }*/
 
     run_dynamic_code();
 
