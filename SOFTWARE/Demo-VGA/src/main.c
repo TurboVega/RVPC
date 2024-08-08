@@ -198,14 +198,14 @@ void prepare_scan_line(uint16_t row) {
     uint32_t col;
     register const uint8_t* char_defs = character_defs[row & 0x7]; // point to array of scan line bits
     register const uint8_t* char_indexes = screen_chars[row >> 3]; // point to array of character codes
+    register uint32_t dyn_code = ((uint32_t) write_pixels); // point to 8 HW instructions per char column
     
     for (col = 0; col < NUM_COLS/2; col++) {
         uint8_t ch = *char_indexes++; // get one character code
         uint8_t def = char_defs[ch]; // get scan line bits for character
-        uint32_t dyn_code = ((uint32_t) write_pixels) + (col * 16); // 8 HW instructions per char column
         SetCodePiece set_code = (SetCodePiece)(((uint32_t)set_dynamic_code) + (def * 10)); // 5 HW instructions per column
         (*set_code)(0xC09CC09C, 0xC01CC09C, 0xC09CC01C, 0xC01CC01C, dyn_code);
-        //set_dynamic_code(0xC09CC09C, 0xC01CC09C, 0xC09CC01C, 0xC01CC01C, dyn_code);
+        dyn_code += 8; // 8 HW instructions per char column
     }
 }
 
