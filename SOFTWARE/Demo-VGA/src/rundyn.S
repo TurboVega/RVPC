@@ -106,6 +106,6 @@ write_pixels:
     WRITE_VIDEO_8 // 28
     WRITE_VIDEO_8 // 29
 
-    WRITE_VIDEO_8 // 30
+    //WRITE_VIDEO_8 // 30
 
     c.jr x1             // return from subroutine

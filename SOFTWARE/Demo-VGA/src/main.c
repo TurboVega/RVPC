@@ -199,7 +199,7 @@ void prepare_scan_line(uint16_t row) {
     register const uint8_t* char_defs = character_defs[row & 0x7]; // point to array of scan line bits
     register const uint8_t* char_indexes = screen_chars[row >> 3]; // point to array of character codes
     
-    for (col = 0; col < NUM_COLS; col++) {
+    for (col = 0; col < NUM_COLS/2; col++) {
         uint8_t ch = *char_indexes++; // get one character code
         uint8_t def = char_defs[ch]; // get scan line bits for character
         uint32_t dyn_code = ((uint32_t) write_pixels) + (col * 16); // 8 HW instructions per char column
