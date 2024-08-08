@@ -50,23 +50,19 @@
     .global   set_dynamic_code
 
     .macro PX00
-//    c.sw x10,0(x14)     // clear 1st pixel and 2nd pixel
-    c.jr x1             // return from subroutine
+    c.sw x10,0(x14)     // clear 1st pixel and 2nd pixel
     .endm
 
     .macro PX01
-//    c.sw x11,0(x14)     // clear 1st pixel; set 2nd pixel
-    c.jr x1             // return from subroutine
+    c.sw x11,0(x14)     // clear 1st pixel; set 2nd pixel
     .endm
 
     .macro PX10
-//    c.sw x12,0(x14)     // set 1st pixel; clear 2nd pixel
-    c.jr x1             // return from subroutine
+    c.sw x12,0(x14)     // set 1st pixel; clear 2nd pixel
     .endm
 
     .macro PX11
-//    c.sw x13,0(x14)     // set 1st pixel and 2nd pixel
-    c.jr x1             // return from subroutine
+    c.sw x13,0(x14)     // set 1st pixel and 2nd pixel
     .endm
 
     .macro RT
