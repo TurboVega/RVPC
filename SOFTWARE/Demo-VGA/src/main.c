@@ -1,4 +1,6 @@
 #include <ch32v00x.h>
+#define DEF_SCREEN_ARRAYS 1
+#include "chardefs.h"
 
 void GPIO_Config(GPIO_TypeDef *GPIO_port, uint16_t GPIO_pin, GPIOMode_TypeDef GPIO_mode) {
 	GPIO_InitTypeDef Config = {0};
@@ -169,7 +171,43 @@ void PWM_Config(TIM_TypeDef *TIM, uint8_t channel, uint16_t pulse, uint16_t mode
 	#define VGA_VFRONT_PORCH    1
 #endif
 
-static uint16_t must_draw;
+// a0 x10   ((USE_BCR  << 0) | (USE_BCR  << 16))  pixels __ (0xC09CC09C)
+// a1 x11   ((USE_BCR  << 0) | (USE_BSHR << 16))  pixels _* (0xC01CC09C)
+// a2 x12   ((USE_BSHR << 0) | (USE_BCR  << 16))  pixels *_ (0xC09CC01C)
+// a3 x13   ((USE_BSHR << 0) | (USE_BSHR << 16))  pixels ** (0xC01CC01C)
+// a4 x14   address of dynamic code for 1 glyph scan line (8 pixels)
+
+typedef void (*SetCodePiece)(uint32_t code0, uint32_t code1, uint32_t code2, uint32_t code3, uint32_t dyn_code);
+
+void init_screen() {
+    //uint8_t ch = 0;
+    for (uint8_t row = 0; row < NUM_ROWS; row++) {
+        for (uint8_t col = 0; col < NUM_COLS; col++) {
+            screen_chars[row][col] = 'a';//ch++;
+        }
+    }
+}
+
+extern void set_dynamic_code();
+extern void run_dynamic_code();
+extern void write_pixels();
+extern void waste_time0();
+extern void waste_time1();
+
+void prepare_scan_line(uint16_t row) {
+    uint32_t col;
+    register const uint8_t* char_defs = character_defs[row & 0x7]; // point to array of scan line bits
+    register const uint8_t* char_indexes = screen_chars[row >> 3]; // point to array of character codes
+    
+    for (col = 0; col < 2/*NUM_COLS*/; col++) {
+        uint8_t ch = *char_indexes++; // get one character code
+        uint8_t def = char_defs[ch]; // get scan line bits for character
+        uint32_t dyn_code = ((uint32_t) run_dynamic_code) + (col * 16); // 8 HW instructions per char column
+        //SetCodePiece set_code = (SetCodePiece)(((uint32_t)set_dynamic_code) + (def * 10)); // 5 HW instructions per column
+        //(*set_code)(0xC09CC09C, 0xC01CC09C, 0xC09CC01C, 0xC01CC01C, dyn_code);
+        set_dynamic_code(0xC09CC09C, 0xC01CC09C, 0xC09CC01C, 0xC01CC01C, dyn_code);
+    }
+}
 
 int main(void) {
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
@@ -208,6 +246,8 @@ int main(void) {
 	TIM_Cmd(VGA_VSYNC_TIM, ENABLE);
 	TIM_Cmd(VGA_HSYNC_TIM, ENABLE);
 
+    init_screen();
+
 	while (1) {
 	}
 }
@@ -235,10 +275,6 @@ void TIM1_IRQHandler(void) {
 	TIM_ClearITPendingBit(TIM1, TIM_IT_Update); 
 }
 
-extern void run_dynamic_code();
-extern void waste_time0();
-extern void waste_time1();
-
 void TIM2_IRQHandler(void)   __attribute__((interrupt("WCH-Interrupt-fast")));
 void TIM2_IRQHandler(void) {
 	static volatile uint32_t current_row = 0;
@@ -248,15 +284,15 @@ void TIM2_IRQHandler(void) {
 		goto exit;
 	}
 
-	// Stupid delay
     waste_time0();
-    /*if (current_row & 1) {
-        waste_time1();
-    } else {
-        waste_time0();
-    }*/
-
     run_dynamic_code();
+
+    current_row -= VGA_VBACK_PORCH;
+    if (current_row < VGA_VACTIVE_LINES-1) {
+        prepare_scan_line(current_row + 1);
+    } else {
+        prepare_scan_line(0);
+    }
 
 exit:
 	GPIO_WriteBit(VGA_DATA_GPIO, VGA_DATA_PIN, 0);

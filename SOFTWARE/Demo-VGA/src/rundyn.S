@@ -70,6 +70,8 @@ run_dynamic_code:
     addi    x9,x9,0x014          // load lower 12 bits of x9 with BCR address
     addi    x15,x0,4             // load x15 with bit value of video-out
 
+    .align 2
+
 write_pixels:
     WRITE_VIDEO_8 // 00
     WRITE_VIDEO_8 // 01
@@ -105,58 +107,5 @@ write_pixels:
     WRITE_VIDEO_8 // 29
 
     WRITE_VIDEO_8 // 30
-    // WRITE_VIDEO_8 // 31
-    // WRITE_VIDEO_8 // 32
-    // WRITE_VIDEO_8 // 33
-    // WRITE_VIDEO_8 // 34
-    // WRITE_VIDEO_8 // 35
-    // WRITE_VIDEO_8 // 36
-    // WRITE_VIDEO_8 // 37
-    // WRITE_VIDEO_8 // 38
-    // WRITE_VIDEO_8 // 39
-
-    // WRITE_VIDEO_8 // 40
-    // WRITE_VIDEO_8 // 41
-    // WRITE_VIDEO_8 // 42
-    // WRITE_VIDEO_8 // 43
-    // WRITE_VIDEO_8 // 44
-    // WRITE_VIDEO_8 // 45
-    // WRITE_VIDEO_8 // 46
-    // WRITE_VIDEO_8 // 47
-    // WRITE_VIDEO_8 // 48
-    // WRITE_VIDEO_8 // 49
-
-    // WRITE_VIDEO_8 // 50
-    // WRITE_VIDEO_8 // 51
-    // WRITE_VIDEO_8 // 52
-    // WRITE_VIDEO_8 // 53
-    // WRITE_VIDEO_8 // 54
-    // WRITE_VIDEO_8 // 55
-    // WRITE_VIDEO_8 // 56
-    // WRITE_VIDEO_8 // 57
-    // WRITE_VIDEO_8 // 58
-    // WRITE_VIDEO_8 // 59
-
-    // WRITE_VIDEO_8 // 60
-    // WRITE_VIDEO_8 // 61
-    // WRITE_VIDEO_8 // 62
-    // WRITE_VIDEO_8 // 63
-    // WRITE_VIDEO_8 // 64
-    // WRITE_VIDEO_8 // 65
-    // WRITE_VIDEO_8 // 66
-    // WRITE_VIDEO_8 // 67
-    // WRITE_VIDEO_8 // 68
-    // WRITE_VIDEO_8 // 69
-
-    // WRITE_VIDEO_8 // 70
-    // WRITE_VIDEO_8 // 71
-    // WRITE_VIDEO_8 // 72
-    // WRITE_VIDEO_8 // 73
-    // WRITE_VIDEO_8 // 74
-    // WRITE_VIDEO_8 // 75
-    // WRITE_VIDEO_8 // 76
-    // WRITE_VIDEO_8 // 77
-    // WRITE_VIDEO_8 // 78
-    // WRITE_VIDEO_8 // 79
 
     c.jr x1             // return from subroutine

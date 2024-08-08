@@ -50,19 +50,23 @@
     .global   set_dynamic_code
 
     .macro PX00
-    c.sw x10,0(x14)     // clear 1st pixel and 2nd pixel
+//    c.sw x10,0(x14)     // clear 1st pixel and 2nd pixel
+    c.jr x1             // return from subroutine
     .endm
 
     .macro PX01
-    c.sw x11,0(x14)     // clear 1st pixel; set 2nd pixel
+//    c.sw x11,0(x14)     // clear 1st pixel; set 2nd pixel
+    c.jr x1             // return from subroutine
     .endm
 
     .macro PX10
-    c.sw x12,0(x14)     // set 1st pixel; clear 2nd pixel
+//    c.sw x12,0(x14)     // set 1st pixel; clear 2nd pixel
+    c.jr x1             // return from subroutine
     .endm
 
     .macro PX11
-    c.sw x13,0(x14)     // set 1st pixel and 2nd pixel
+//    c.sw x13,0(x14)     // set 1st pixel and 2nd pixel
+    c.jr x1             // return from subroutine
     .endm
 
     .macro RT
@@ -75,6 +79,8 @@
 // glyph scan line contents (i.e., the 8-bit value of the pixel arrangement
 // in a single scan line of a single character glyph).
 //
+
+    .align 2
 
 set_dynamic_code:
 
