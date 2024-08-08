@@ -180,10 +180,10 @@ void PWM_Config(TIM_TypeDef *TIM, uint8_t channel, uint16_t pulse, uint16_t mode
 typedef void (*SetCodePiece)(uint32_t code0, uint32_t code1, uint32_t code2, uint32_t code3, uint32_t dyn_code);
 
 void init_screen() {
-    //uint8_t ch = 0;
+    uint8_t ch = 0;
     for (uint8_t row = 0; row < NUM_ROWS; row++) {
         for (uint8_t col = 0; col < NUM_COLS; col++) {
-            screen_chars[row][col] = 'a';//ch++;
+            screen_chars[row][col] = ch++;
         }
     }
 }
@@ -199,10 +199,11 @@ void prepare_scan_line(uint16_t row) {
     register const uint8_t* char_defs = character_defs[row & 0x7]; // point to array of scan line bits
     register const uint8_t* char_indexes = screen_chars[row >> 3]; // point to array of character codes
     register uint32_t dyn_code = ((uint32_t) write_pixels); // point to 8 HW instructions per char column
+    char_indexes = (uint8_t*)"abcdefghijklmnop";
     
-    for (col = 0; col < NUM_COLS/2; col++) {
-        uint8_t ch = *char_indexes++; // get one character code
-        uint8_t def = char_defs[ch]; // get scan line bits for character
+    for (col = 0; col < 2/*NUM_COLS*/; col++) {
+        uint16_t ch = (uint16_t)(*char_indexes++); // get one character code
+        uint16_t def = (uint16_t)(char_defs[ch]); // get scan line bits for character
         SetCodePiece set_code = (SetCodePiece)(((uint32_t)set_dynamic_code) + (def * 10)); // 5 HW instructions per column
         (*set_code)(0xC09CC09C, 0xC01CC09C, 0xC09CC01C, 0xC01CC01C, dyn_code);
         dyn_code += 8; // 8 HW instructions per char column
@@ -287,9 +288,9 @@ void TIM2_IRQHandler(void) {
     waste_time0();
     run_dynamic_code();
 
-    current_row -= VGA_VBACK_PORCH;
-    if (current_row < VGA_VACTIVE_LINES-1) {
-        prepare_scan_line(current_row + 1);
+    uint16_t row = (uint16_t)(current_row - VGA_VBACK_PORCH);
+    if (row < VGA_VACTIVE_LINES-1) {
+        prepare_scan_line(row + 1);
     } else {
         prepare_scan_line(0);
     }
