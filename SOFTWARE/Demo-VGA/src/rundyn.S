@@ -73,38 +73,38 @@ run_dynamic_code:
 write_pixels:
     WRITE_VIDEO_8 // 00
     WRITE_VIDEO_8 // 01
-    // WRITE_VIDEO_8 // 02
-    // WRITE_VIDEO_8 // 03
-    // WRITE_VIDEO_8 // 04
-    // WRITE_VIDEO_8 // 05
-    // WRITE_VIDEO_8 // 06
-    // WRITE_VIDEO_8 // 07
-    // WRITE_VIDEO_8 // 08
-    // WRITE_VIDEO_8 // 09
+    WRITE_VIDEO_8 // 02
+    WRITE_VIDEO_8 // 03
+    WRITE_VIDEO_8 // 04
+    WRITE_VIDEO_8 // 05
+    WRITE_VIDEO_8 // 06
+    WRITE_VIDEO_8 // 07
+    WRITE_VIDEO_8 // 08
+    WRITE_VIDEO_8 // 09
 
-    // WRITE_VIDEO_8 // 10
-    // WRITE_VIDEO_8 // 11
-    // WRITE_VIDEO_8 // 12
-    // WRITE_VIDEO_8 // 13
-    // WRITE_VIDEO_8 // 14
-    // WRITE_VIDEO_8 // 15
-    // WRITE_VIDEO_8 // 16
-    // WRITE_VIDEO_8 // 17
-    // WRITE_VIDEO_8 // 18
-    // WRITE_VIDEO_8 // 19
+    WRITE_VIDEO_8 // 10
+    WRITE_VIDEO_8 // 11
+    WRITE_VIDEO_8 // 12
+    WRITE_VIDEO_8 // 13
+    WRITE_VIDEO_8 // 14
+    WRITE_VIDEO_8 // 15
+    WRITE_VIDEO_8 // 16
+    WRITE_VIDEO_8 // 17
+    WRITE_VIDEO_8 // 18
+    WRITE_VIDEO_8 // 19
 
-    // WRITE_VIDEO_8 // 20
-    // WRITE_VIDEO_8 // 21
-    // WRITE_VIDEO_8 // 22
-    // WRITE_VIDEO_8 // 23
-    // WRITE_VIDEO_8 // 24
-    // WRITE_VIDEO_8 // 25
-    // WRITE_VIDEO_8 // 26
-    // WRITE_VIDEO_8 // 27
-    // WRITE_VIDEO_8 // 28
-    // WRITE_VIDEO_8 // 29
+    WRITE_VIDEO_8 // 20
+    WRITE_VIDEO_8 // 21
+    WRITE_VIDEO_8 // 22
+    WRITE_VIDEO_8 // 23
+    WRITE_VIDEO_8 // 24
+    WRITE_VIDEO_8 // 25
+    WRITE_VIDEO_8 // 26
+    WRITE_VIDEO_8 // 27
+    WRITE_VIDEO_8 // 28
+    WRITE_VIDEO_8 // 29
 
-    // WRITE_VIDEO_8 // 30
+    WRITE_VIDEO_8 // 30
     // WRITE_VIDEO_8 // 31
     // WRITE_VIDEO_8 // 32
     // WRITE_VIDEO_8 // 33
