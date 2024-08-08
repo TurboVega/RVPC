@@ -57,9 +57,9 @@
 
     .macro WRITE_VIDEO_8
     PIX_PAIR
-    //PIX_PAIR
-    //PIX_PAIR
-    //PIX_PAIR
+    PIX_PAIR
+    PIX_PAIR
+    PIX_PAIR
     .endm
 
 run_dynamic_code:
@@ -72,7 +72,7 @@ run_dynamic_code:
 
 write_pixels:
     WRITE_VIDEO_8 // 00
-    // WRITE_VIDEO_8 // 01
+    WRITE_VIDEO_8 // 01
     // WRITE_VIDEO_8 // 02
     // WRITE_VIDEO_8 // 03
     // WRITE_VIDEO_8 // 04
