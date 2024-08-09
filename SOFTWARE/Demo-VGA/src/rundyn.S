@@ -64,10 +64,14 @@
 
 run_dynamic_code:
 
-    lui     x8,0x40011           // load upper 20 bits of x8 with BSHR address
-    addi    x8,x8,0x010          // load lower 12 bits of x8 with BSHR address
-    lui     x9,0x40011           // load upper 20 bits of x9 with BCR address
-    addi    x9,x9,0x014          // load lower 12 bits of x9 with BCR address
+    li      x8,0x40011010        // load 32 bits of x8 with BSHR address
+    // lui     x8,0x40011           // load upper 20 bits of x8 with BSHR address
+    // addi    x8,x8,0x010          // load lower 12 bits of x8 with BSHR address
+
+    li      x9,0x40011014        // load upper 20 bits of x9 with BCR address
+    // lui     x9,0x40011           // load upper 20 bits of x9 with BCR address
+    // addi    x9,x9,0x014          // load lower 12 bits of x9 with BCR address
+
     addi    x15,x0,4             // load x15 with bit value of video-out
 
     .align 2
