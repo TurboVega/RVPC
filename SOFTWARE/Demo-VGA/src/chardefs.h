@@ -2360,15 +2360,7 @@
 
 //--------------------------------
 
-#define CHAR_LINE(n, c) \
-    (n == 0 ? CHAR_DEF_##c##_0 : \
-     n == 1 ? CHAR_DEF_##c##_1 : \
-     n == 2 ? CHAR_DEF_##c##_2 : \
-     n == 3 ? CHAR_DEF_##c##_3 : \
-     n == 4 ? CHAR_DEF_##c##_4 : \
-     n == 5 ? CHAR_DEF_##c##_5 : \
-     n == 6 ? CHAR_DEF_##c##_6 : \
-     CHAR_DEF_##c##_7)
+#define CHAR_LINE(n, c) (CHAR_DEF_##c##_##n)
 
 #define CHARSET_LINE(n) \
     { \

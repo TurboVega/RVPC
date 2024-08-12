@@ -51,7 +51,8 @@
     .global   write_pixels
 
     .macro PIX_PAIR
-    c.sw x15,0(x8)      // set a pixel
+    c.sw x15,0(x9)      // clear a pixel
+//    c.sw x15,0(x8)      // set a pixel
     c.sw x15,0(x9)      // clear a pixel
     .endm
 
@@ -64,15 +65,18 @@
 
 run_dynamic_code:
 
-    li      x8,0x40011010        // load 32 bits of x8 with BSHR address
+    mv      x5,x8               // save x8
+    mv      x6,x9               // save x9
+
+    li      x8,0x40011010       // load 32 bits of x8 with BSHR address
     // lui     x8,0x40011           // load upper 20 bits of x8 with BSHR address
     // addi    x8,x8,0x010          // load lower 12 bits of x8 with BSHR address
 
-    li      x9,0x40011014        // load upper 20 bits of x9 with BCR address
+    li      x9,0x40011014       // load upper 20 bits of x9 with BCR address
     // lui     x9,0x40011           // load upper 20 bits of x9 with BCR address
     // addi    x9,x9,0x014          // load lower 12 bits of x9 with BCR address
 
-    addi    x15,x0,4             // load x15 with bit value of video-out
+    addi    x15,x0,4            // load x15 with bit value of video-out
 
     .align 2
 
@@ -112,4 +116,6 @@ write_pixels:
 
     //WRITE_VIDEO_8 // 30
 
-    c.jr x1             // return from subroutine
+    mv      x8,x5       // restore x8
+    mv      x9,x6       // restore x9
+    c.jr    x1          // return from subroutine

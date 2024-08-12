@@ -196,17 +196,16 @@ extern void waste_time1();
 
 void prepare_scan_line(uint16_t row) {
     uint32_t col;
-    register const uint8_t* char_defs = character_defs[row & 0x7]; // point to array of scan line bits
-    register const uint8_t* char_indexes = screen_chars[row >> 3]; // point to array of character codes
+    register const uint8_t* char_defs = character_defs[row & 0x7]; // point to array of scan line bits (glyph pixels)
+    register const uint8_t* char_indexes = screen_chars[row >> 3]; // point to array of character codes (text line)
     register uint32_t dyn_code = ((uint32_t) write_pixels); // point to 8 HW instructions per char column
 
-    for (col = 0; col < NUM_COLS; col++) {
+    for (col = 0; col < 16/*NUM_COLS*/; col++) {
         uint16_t ch = (uint16_t)(*char_indexes++); // get one character code
-        uint16_t def = (uint16_t)(char_defs[ch++]); // get scan line bits for character
-        //SetCodePiece set_code = (SetCodePiece)(((uint32_t)set_dynamic_code) + (def * 10)); // 5 HW instructions per column
-        SetCodePiece set_code = (SetCodePiece)(((uint32_t)set_dynamic_code) + (0x00 * 10)); // 5 HW instructions per column
+        uint16_t def = (uint16_t)(char_defs[ch]); // get scan line bits for character
+        SetCodePiece set_code = (SetCodePiece)(((uint32_t)set_dynamic_code) + (def * 10)); // 5 HW instructions per column
         (*set_code)(0xC09CC09C, 0xC01CC09C, 0xC09CC01C, 0xC01CC01C, dyn_code);
-        dyn_code += 8; // 8 HW instructions per char column
+        dyn_code += 16; // 8 HW instructions per char column
     }
 }
 
@@ -278,9 +277,8 @@ void TIM1_IRQHandler(void) {
 
 void TIM2_IRQHandler(void)   __attribute__((interrupt("WCH-Interrupt-fast")));
 void TIM2_IRQHandler(void) {
-	static volatile uint32_t current_row = 0;
 
-	current_row = VGA_VSYNC_TIM->CNT;
+	uint32_t current_row = VGA_VSYNC_TIM->CNT;
 	if (current_row <= VGA_VBACK_PORCH || current_row >= (VGA_VPERIOD - VGA_VFRONT_PORCH)) {
 		goto exit;
 	}
@@ -288,14 +286,14 @@ void TIM2_IRQHandler(void) {
     waste_time0();
     run_dynamic_code();
 
-    uint16_t row = (uint16_t)(current_row - VGA_VBACK_PORCH);
+    uint16_t row = ((uint16_t)(current_row - (VGA_VBACK_PORCH+1))) >> 1;
     if (row < VGA_VACTIVE_LINES-1) {
-        prepare_scan_line(row + 1);
+        prepare_scan_line(row);
     } else {
         prepare_scan_line(0);
     }
 
 exit:
-	GPIO_WriteBit(VGA_DATA_GPIO, VGA_DATA_PIN, 0);
+	VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
 	TIM_ClearITPendingBit(TIM2, TIM_IT_Update); 
 }

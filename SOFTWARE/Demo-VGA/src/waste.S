@@ -19,10 +19,10 @@ waste_time1:
 
 waste_time0:
 
-    addi    x8,x0,20            // load delay loop count
+    addi    x5,x0,20            // load delay loop count
 
 waste_loop:
 
-    addi    x8,x8,-1            // decrease count
-    bne     x8,x0,waste_loop    // back if more delay
+    addi    x5,x5,-1            // decrease count
+    bne     x5,x0,waste_loop    // back if more delay
     jr      x1                  // return from subroutine
