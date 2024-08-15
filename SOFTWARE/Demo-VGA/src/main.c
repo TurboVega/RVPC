@@ -195,7 +195,7 @@ void write_scan_line(uint16_t row) {
     register uint32_t bshr = (uint32_t)(&VGA_DATA_GPIO->BSHR);
     register uint32_t bcr = (uint32_t)(&VGA_DATA_GPIO->BCR);
 
-    for (col = 0; col < 8/*NUM_COLS*/; col++) {
+    for (col = 0; col < 10/*NUM_COLS*/; col++) {
         uint16_t ch = (uint16_t)(*char_indexes++); // get one character code
         Write8Pixels write = char_defs[ch]; // get function ptr for writing scan line of character
         (*write)(video_out, bshr, bcr);
@@ -271,13 +271,15 @@ void TIM1_IRQHandler(void) {
 void TIM2_IRQHandler(void)   __attribute__((interrupt("WCH-Interrupt-fast")));
 void TIM2_IRQHandler(void) {
 
+#define VADJUST 4
+
 	uint32_t current_row = VGA_VSYNC_TIM->CNT;
-	if (current_row < VGA_VBACK_PORCH || current_row >= (VGA_VPERIOD - VGA_VFRONT_PORCH)) {
+	if (current_row < VGA_VBACK_PORCH+VADJUST || current_row >= VGA_VBACK_PORCH+VADJUST+(16*NUM_ROWS)) {
 		goto exit;
 	}
 
     waste_time0();
-    write_scan_line((current_row - VGA_VBACK_PORCH) >> 1);
+    write_scan_line((current_row-VGA_VBACK_PORCH-VADJUST) >> 1);
 
 exit:
 	VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
