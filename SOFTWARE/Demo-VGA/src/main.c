@@ -242,6 +242,16 @@ int main(void) {
     init_screen();
 
 	while (1) {
+        for (uint8_t row = 0; row < NUM_ROWS; row++) {
+            for (uint8_t col = 0; col < NUM_COLS; col++) {
+                uint8_t* cursor = &screen_chars[row][col];
+                uint8_t ch = *cursor + 1;
+                if (ch > 0x7E) {
+                    ch = 0x20;
+                }
+                *cursor = ch;
+            }
+        }
 	}
 }
 
