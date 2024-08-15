@@ -19,262 +19,262 @@
 
     .global   draw_pixels
 
-    .extern   drw8_0x00
-    .extern   drw8_0x01
-    .extern   drw8_0x02
-    .extern   drw8_0x03
-    .extern   drw8_0x04
-    .extern   drw8_0x05
-    .extern   drw8_0x06
-    .extern   drw8_0x07
-    .extern   drw8_0x08
-    .extern   drw8_0x09
-    .extern   drw8_0x0A
-    .extern   drw8_0x0B
-    .extern   drw8_0x0C
-    .extern   drw8_0x0D
-    .extern   drw8_0x0E
-    .extern   drw8_0x0F
-    .extern   drw8_0x10
-    .extern   drw8_0x11
-    .extern   drw8_0x12
-    .extern   drw8_0x13
-    .extern   drw8_0x14
-    .extern   drw8_0x15
-    .extern   drw8_0x16
-    .extern   drw8_0x17
-    .extern   drw8_0x18
-    .extern   drw8_0x19
-    .extern   drw8_0x1A
-    .extern   drw8_0x1B
-    .extern   drw8_0x1C
-    .extern   drw8_0x1D
-    .extern   drw8_0x1E
-    .extern   drw8_0x1F
-    .extern   drw8_0x20
-    .extern   drw8_0x21
-    .extern   drw8_0x22
-    .extern   drw8_0x23
-    .extern   drw8_0x24
-    .extern   drw8_0x25
-    .extern   drw8_0x26
-    .extern   drw8_0x27
-    .extern   drw8_0x28
-    .extern   drw8_0x29
-    .extern   drw8_0x2A
-    .extern   drw8_0x2B
-    .extern   drw8_0x2C
-    .extern   drw8_0x2D
-    .extern   drw8_0x2E
-    .extern   drw8_0x2F
-    .extern   drw8_0x30
-    .extern   drw8_0x31
-    .extern   drw8_0x32
-    .extern   drw8_0x33
-    .extern   drw8_0x34
-    .extern   drw8_0x35
-    .extern   drw8_0x36
-    .extern   drw8_0x37
-    .extern   drw8_0x38
-    .extern   drw8_0x39
-    .extern   drw8_0x3A
-    .extern   drw8_0x3B
-    .extern   drw8_0x3C
-    .extern   drw8_0x3D
-    .extern   drw8_0x3E
-    .extern   drw8_0x3F
-    .extern   drw8_0x40
-    .extern   drw8_0x41
-    .extern   drw8_0x42
-    .extern   drw8_0x43
-    .extern   drw8_0x44
-    .extern   drw8_0x45
-    .extern   drw8_0x46
-    .extern   drw8_0x47
-    .extern   drw8_0x48
-    .extern   drw8_0x49
-    .extern   drw8_0x4A
-    .extern   drw8_0x4B
-    .extern   drw8_0x4C
-    .extern   drw8_0x4D
-    .extern   drw8_0x4E
-    .extern   drw8_0x4F
-    .extern   drw8_0x50
-    .extern   drw8_0x51
-    .extern   drw8_0x52
-    .extern   drw8_0x53
-    .extern   drw8_0x54
-    .extern   drw8_0x55
-    .extern   drw8_0x56
-    .extern   drw8_0x57
-    .extern   drw8_0x58
-    .extern   drw8_0x59
-    .extern   drw8_0x5A
-    .extern   drw8_0x5B
-    .extern   drw8_0x5C
-    .extern   drw8_0x5D
-    .extern   drw8_0x5E
-    .extern   drw8_0x5F
-    .extern   drw8_0x60
-    .extern   drw8_0x61
-    .extern   drw8_0x62
-    .extern   drw8_0x63
-    .extern   drw8_0x64
-    .extern   drw8_0x65
-    .extern   drw8_0x66
-    .extern   drw8_0x67
-    .extern   drw8_0x68
-    .extern   drw8_0x69
-    .extern   drw8_0x6A
-    .extern   drw8_0x6B
-    .extern   drw8_0x6C
-    .extern   drw8_0x6D
-    .extern   drw8_0x6E
-    .extern   drw8_0x6F
-    .extern   drw8_0x70
-    .extern   drw8_0x71
-    .extern   drw8_0x72
-    .extern   drw8_0x73
-    .extern   drw8_0x74
-    .extern   drw8_0x75
-    .extern   drw8_0x76
-    .extern   drw8_0x77
-    .extern   drw8_0x78
-    .extern   drw8_0x79
-    .extern   drw8_0x7A
-    .extern   drw8_0x7B
-    .extern   drw8_0x7C
-    .extern   drw8_0x7D
-    .extern   drw8_0x7E
-    .extern   drw8_0x7F
-    .extern   drw8_0x80
-    .extern   drw8_0x81
-    .extern   drw8_0x82
-    .extern   drw8_0x83
-    .extern   drw8_0x84
-    .extern   drw8_0x85
-    .extern   drw8_0x86
-    .extern   drw8_0x87
-    .extern   drw8_0x88
-    .extern   drw8_0x89
-    .extern   drw8_0x8A
-    .extern   drw8_0x8B
-    .extern   drw8_0x8C
-    .extern   drw8_0x8D
-    .extern   drw8_0x8E
-    .extern   drw8_0x8F
-    .extern   drw8_0x90
-    .extern   drw8_0x91
-    .extern   drw8_0x92
-    .extern   drw8_0x93
-    .extern   drw8_0x94
-    .extern   drw8_0x95
-    .extern   drw8_0x96
-    .extern   drw8_0x97
-    .extern   drw8_0x98
-    .extern   drw8_0x99
-    .extern   drw8_0x9A
-    .extern   drw8_0x9B
-    .extern   drw8_0x9C
-    .extern   drw8_0x9D
-    .extern   drw8_0x9E
-    .extern   drw8_0x9F
-    .extern   drw8_0xA0
-    .extern   drw8_0xA1
-    .extern   drw8_0xA2
-    .extern   drw8_0xA3
-    .extern   drw8_0xA4
-    .extern   drw8_0xA5
-    .extern   drw8_0xA6
-    .extern   drw8_0xA7
-    .extern   drw8_0xA8
-    .extern   drw8_0xA9
-    .extern   drw8_0xAA
-    .extern   drw8_0xAB
-    .extern   drw8_0xAC
-    .extern   drw8_0xAD
-    .extern   drw8_0xAE
-    .extern   drw8_0xAF
-    .extern   drw8_0xB0
-    .extern   drw8_0xB1
-    .extern   drw8_0xB2
-    .extern   drw8_0xB3
-    .extern   drw8_0xB4
-    .extern   drw8_0xB5
-    .extern   drw8_0xB6
-    .extern   drw8_0xB7
-    .extern   drw8_0xB8
-    .extern   drw8_0xB9
-    .extern   drw8_0xBA
-    .extern   drw8_0xBB
-    .extern   drw8_0xBC
-    .extern   drw8_0xBD
-    .extern   drw8_0xBE
-    .extern   drw8_0xBF
-    .extern   drw8_0xC0
-    .extern   drw8_0xC1
-    .extern   drw8_0xC2
-    .extern   drw8_0xC3
-    .extern   drw8_0xC4
-    .extern   drw8_0xC5
-    .extern   drw8_0xC6
-    .extern   drw8_0xC7
-    .extern   drw8_0xC8
-    .extern   drw8_0xC9
-    .extern   drw8_0xCA
-    .extern   drw8_0xCB
-    .extern   drw8_0xCC
-    .extern   drw8_0xCD
-    .extern   drw8_0xCE
-    .extern   drw8_0xCF
-    .extern   drw8_0xD0
-    .extern   drw8_0xD1
-    .extern   drw8_0xD2
-    .extern   drw8_0xD3
-    .extern   drw8_0xD4
-    .extern   drw8_0xD5
-    .extern   drw8_0xD6
-    .extern   drw8_0xD7
-    .extern   drw8_0xD8
-    .extern   drw8_0xD9
-    .extern   drw8_0xDA
-    .extern   drw8_0xDB
-    .extern   drw8_0xDC
-    .extern   drw8_0xDD
-    .extern   drw8_0xDE
-    .extern   drw8_0xDF
-    .extern   drw8_0xE0
-    .extern   drw8_0xE1
-    .extern   drw8_0xE2
-    .extern   drw8_0xE3
-    .extern   drw8_0xE4
-    .extern   drw8_0xE5
-    .extern   drw8_0xE6
-    .extern   drw8_0xE7
-    .extern   drw8_0xE8
-    .extern   drw8_0xE9
-    .extern   drw8_0xEA
-    .extern   drw8_0xEB
-    .extern   drw8_0xEC
-    .extern   drw8_0xED
-    .extern   drw8_0xEE
-    .extern   drw8_0xEF
-    .extern   drw8_0xF0
-    .extern   drw8_0xF1
-    .extern   drw8_0xF2
-    .extern   drw8_0xF3
-    .extern   drw8_0xF4
-    .extern   drw8_0xF5
-    .extern   drw8_0xF6
-    .extern   drw8_0xF7
-    .extern   drw8_0xF8
-    .extern   drw8_0xF9
-    .extern   drw8_0xFA
-    .extern   drw8_0xFB
-    .extern   drw8_0xFC
-    .extern   drw8_0xFD
-    .extern   drw8_0xFE
-    .extern   drw8_0xFF
+    .global   drw8_0x00
+    .global   drw8_0x01
+    .global   drw8_0x02
+    .global   drw8_0x03
+    .global   drw8_0x04
+    .global   drw8_0x05
+    .global   drw8_0x06
+    .global   drw8_0x07
+    .global   drw8_0x08
+    .global   drw8_0x09
+    .global   drw8_0x0A
+    .global   drw8_0x0B
+    .global   drw8_0x0C
+    .global   drw8_0x0D
+    .global   drw8_0x0E
+    .global   drw8_0x0F
+    .global   drw8_0x10
+    .global   drw8_0x11
+    .global   drw8_0x12
+    .global   drw8_0x13
+    .global   drw8_0x14
+    .global   drw8_0x15
+    .global   drw8_0x16
+    .global   drw8_0x17
+    .global   drw8_0x18
+    .global   drw8_0x19
+    .global   drw8_0x1A
+    .global   drw8_0x1B
+    .global   drw8_0x1C
+    .global   drw8_0x1D
+    .global   drw8_0x1E
+    .global   drw8_0x1F
+    .global   drw8_0x20
+    .global   drw8_0x21
+    .global   drw8_0x22
+    .global   drw8_0x23
+    .global   drw8_0x24
+    .global   drw8_0x25
+    .global   drw8_0x26
+    .global   drw8_0x27
+    .global   drw8_0x28
+    .global   drw8_0x29
+    .global   drw8_0x2A
+    .global   drw8_0x2B
+    .global   drw8_0x2C
+    .global   drw8_0x2D
+    .global   drw8_0x2E
+    .global   drw8_0x2F
+    .global   drw8_0x30
+    .global   drw8_0x31
+    .global   drw8_0x32
+    .global   drw8_0x33
+    .global   drw8_0x34
+    .global   drw8_0x35
+    .global   drw8_0x36
+    .global   drw8_0x37
+    .global   drw8_0x38
+    .global   drw8_0x39
+    .global   drw8_0x3A
+    .global   drw8_0x3B
+    .global   drw8_0x3C
+    .global   drw8_0x3D
+    .global   drw8_0x3E
+    .global   drw8_0x3F
+    .global   drw8_0x40
+    .global   drw8_0x41
+    .global   drw8_0x42
+    .global   drw8_0x43
+    .global   drw8_0x44
+    .global   drw8_0x45
+    .global   drw8_0x46
+    .global   drw8_0x47
+    .global   drw8_0x48
+    .global   drw8_0x49
+    .global   drw8_0x4A
+    .global   drw8_0x4B
+    .global   drw8_0x4C
+    .global   drw8_0x4D
+    .global   drw8_0x4E
+    .global   drw8_0x4F
+    .global   drw8_0x50
+    .global   drw8_0x51
+    .global   drw8_0x52
+    .global   drw8_0x53
+    .global   drw8_0x54
+    .global   drw8_0x55
+    .global   drw8_0x56
+    .global   drw8_0x57
+    .global   drw8_0x58
+    .global   drw8_0x59
+    .global   drw8_0x5A
+    .global   drw8_0x5B
+    .global   drw8_0x5C
+    .global   drw8_0x5D
+    .global   drw8_0x5E
+    .global   drw8_0x5F
+    .global   drw8_0x60
+    .global   drw8_0x61
+    .global   drw8_0x62
+    .global   drw8_0x63
+    .global   drw8_0x64
+    .global   drw8_0x65
+    .global   drw8_0x66
+    .global   drw8_0x67
+    .global   drw8_0x68
+    .global   drw8_0x69
+    .global   drw8_0x6A
+    .global   drw8_0x6B
+    .global   drw8_0x6C
+    .global   drw8_0x6D
+    .global   drw8_0x6E
+    .global   drw8_0x6F
+    .global   drw8_0x70
+    .global   drw8_0x71
+    .global   drw8_0x72
+    .global   drw8_0x73
+    .global   drw8_0x74
+    .global   drw8_0x75
+    .global   drw8_0x76
+    .global   drw8_0x77
+    .global   drw8_0x78
+    .global   drw8_0x79
+    .global   drw8_0x7A
+    .global   drw8_0x7B
+    .global   drw8_0x7C
+    .global   drw8_0x7D
+    .global   drw8_0x7E
+    .global   drw8_0x7F
+    .global   drw8_0x80
+    .global   drw8_0x81
+    .global   drw8_0x82
+    .global   drw8_0x83
+    .global   drw8_0x84
+    .global   drw8_0x85
+    .global   drw8_0x86
+    .global   drw8_0x87
+    .global   drw8_0x88
+    .global   drw8_0x89
+    .global   drw8_0x8A
+    .global   drw8_0x8B
+    .global   drw8_0x8C
+    .global   drw8_0x8D
+    .global   drw8_0x8E
+    .global   drw8_0x8F
+    .global   drw8_0x90
+    .global   drw8_0x91
+    .global   drw8_0x92
+    .global   drw8_0x93
+    .global   drw8_0x94
+    .global   drw8_0x95
+    .global   drw8_0x96
+    .global   drw8_0x97
+    .global   drw8_0x98
+    .global   drw8_0x99
+    .global   drw8_0x9A
+    .global   drw8_0x9B
+    .global   drw8_0x9C
+    .global   drw8_0x9D
+    .global   drw8_0x9E
+    .global   drw8_0x9F
+    .global   drw8_0xA0
+    .global   drw8_0xA1
+    .global   drw8_0xA2
+    .global   drw8_0xA3
+    .global   drw8_0xA4
+    .global   drw8_0xA5
+    .global   drw8_0xA6
+    .global   drw8_0xA7
+    .global   drw8_0xA8
+    .global   drw8_0xA9
+    .global   drw8_0xAA
+    .global   drw8_0xAB
+    .global   drw8_0xAC
+    .global   drw8_0xAD
+    .global   drw8_0xAE
+    .global   drw8_0xAF
+    .global   drw8_0xB0
+    .global   drw8_0xB1
+    .global   drw8_0xB2
+    .global   drw8_0xB3
+    .global   drw8_0xB4
+    .global   drw8_0xB5
+    .global   drw8_0xB6
+    .global   drw8_0xB7
+    .global   drw8_0xB8
+    .global   drw8_0xB9
+    .global   drw8_0xBA
+    .global   drw8_0xBB
+    .global   drw8_0xBC
+    .global   drw8_0xBD
+    .global   drw8_0xBE
+    .global   drw8_0xBF
+    .global   drw8_0xC0
+    .global   drw8_0xC1
+    .global   drw8_0xC2
+    .global   drw8_0xC3
+    .global   drw8_0xC4
+    .global   drw8_0xC5
+    .global   drw8_0xC6
+    .global   drw8_0xC7
+    .global   drw8_0xC8
+    .global   drw8_0xC9
+    .global   drw8_0xCA
+    .global   drw8_0xCB
+    .global   drw8_0xCC
+    .global   drw8_0xCD
+    .global   drw8_0xCE
+    .global   drw8_0xCF
+    .global   drw8_0xD0
+    .global   drw8_0xD1
+    .global   drw8_0xD2
+    .global   drw8_0xD3
+    .global   drw8_0xD4
+    .global   drw8_0xD5
+    .global   drw8_0xD6
+    .global   drw8_0xD7
+    .global   drw8_0xD8
+    .global   drw8_0xD9
+    .global   drw8_0xDA
+    .global   drw8_0xDB
+    .global   drw8_0xDC
+    .global   drw8_0xDD
+    .global   drw8_0xDE
+    .global   drw8_0xDF
+    .global   drw8_0xE0
+    .global   drw8_0xE1
+    .global   drw8_0xE2
+    .global   drw8_0xE3
+    .global   drw8_0xE4
+    .global   drw8_0xE5
+    .global   drw8_0xE6
+    .global   drw8_0xE7
+    .global   drw8_0xE8
+    .global   drw8_0xE9
+    .global   drw8_0xEA
+    .global   drw8_0xEB
+    .global   drw8_0xEC
+    .global   drw8_0xED
+    .global   drw8_0xEE
+    .global   drw8_0xEF
+    .global   drw8_0xF0
+    .global   drw8_0xF1
+    .global   drw8_0xF2
+    .global   drw8_0xF3
+    .global   drw8_0xF4
+    .global   drw8_0xF5
+    .global   drw8_0xF6
+    .global   drw8_0xF7
+    .global   drw8_0xF8
+    .global   drw8_0xF9
+    .global   drw8_0xFA
+    .global   drw8_0xFB
+    .global   drw8_0xFC
+    .global   drw8_0xFD
+    .global   drw8_0xFE
+    .global   drw8_0xFF
 
     .macro USE_BSHR
     c.sw x10,0(x8)      // store video-out bit into GPIO BSHR */
@@ -320,6 +320,11 @@
 // in a single scan line of a single character glyph).
 //
 
+// This function list includes all 8-pixel combinations that
+// are actually used in defining characters. Unused functions
+// are commented out, to preserve space in flash memory.
+
+
     .align 2
 
 draw_pixels:
@@ -330,21 +335,21 @@ drw8_0x00:
     PX00
     PX00
     RT
-
+/*
 drw8_0x01:
     PX00
     PX00
     PX00
     PX01
     RT
-
+*/
 drw8_0x02:
     PX00
     PX00
     PX00
     PX10
     RT
-
+/*
 drw8_0x03:
     PX00
     PX00
@@ -365,14 +370,14 @@ drw8_0x05:
     PX01
     PX01
     RT
-
+*/
 drw8_0x06:
     PX00
     PX00
     PX01
     PX10
     RT
-
+/*
 drw8_0x07:
     PX00
     PX00
@@ -407,42 +412,42 @@ drw8_0x0B:
     PX10
     PX11
     RT
-
+*/
 drw8_0x0C:
     PX00
     PX00
     PX11
     PX00
     RT
-
+/*
 drw8_0x0D:
     PX00
     PX00
     PX11
     PX01
     RT
-
+*/
 drw8_0x0E:
     PX00
     PX00
     PX11
     PX10
     RT
-
+/*
 drw8_0x0F:
     PX00
     PX00
     PX11
     PX11
     RT
-
+*/
 drw8_0x10:
     PX00
     PX01
     PX00
     PX00
     RT
-
+/*
 drw8_0x11:
     PX00
     PX01
@@ -477,28 +482,28 @@ drw8_0x15:
     PX01
     PX01
     RT
-
+*/
 drw8_0x16:
     PX00
     PX01
     PX01
     PX10
     RT
-
+/*
 drw8_0x17:
     PX00
     PX01
     PX01
     PX11
     RT
-
+*/
 drw8_0x18:
     PX00
     PX01
     PX10
     PX00
     RT
-
+/*
 drw8_0x19:
     PX00
     PX01
@@ -519,42 +524,42 @@ drw8_0x1B:
     PX10
     PX11
     RT
-
+*/
 drw8_0x1C:
     PX00
     PX01
     PX11
     PX00
     RT
-
+/*
 drw8_0x1D:
     PX00
     PX01
     PX11
     PX01
     RT
-
+*/
 drw8_0x1E:
     PX00
     PX01
     PX11
     PX10
     RT
-
+/*
 drw8_0x1F:
     PX00
     PX01
     PX11
     PX11
     RT
-
+*/
 drw8_0x20:
     PX00
     PX10
     PX00
     PX00
     RT
-
+/*
 drw8_0x21:
     PX00
     PX10
@@ -575,14 +580,14 @@ drw8_0x23:
     PX00
     PX11
     RT
-
+*/
 drw8_0x24:
     PX00
     PX10
     PX01
     PX00
     RT
-
+/*
 drw8_0x25:
     PX00
     PX10
@@ -659,70 +664,70 @@ drw8_0x2F:
     PX11
     PX11
     RT
-
+*/
 drw8_0x30:
     PX00
     PX11
     PX00
     PX00
     RT
-
+/*
 drw8_0x31:
     PX00
     PX11
     PX00
     PX01
     RT
-
+*/
 drw8_0x32:
     PX00
     PX11
     PX00
     PX10
     RT
-
+/*
 drw8_0x33:
     PX00
     PX11
     PX00
     PX11
     RT
-
+*/
 drw8_0x34:
     PX00
     PX11
     PX01
     PX00
     RT
-
+/*
 drw8_0x35:
     PX00
     PX11
     PX01
     PX01
     RT
-
+*/
 drw8_0x36:
     PX00
     PX11
     PX01
     PX10
     RT
-
+/*
 drw8_0x37:
     PX00
     PX11
     PX01
     PX11
     RT
-
+*/
 drw8_0x38:
     PX00
     PX11
     PX10
     PX00
     RT
-
+/*
 drw8_0x39:
     PX00
     PX11
@@ -743,14 +748,14 @@ drw8_0x3B:
     PX10
     PX11
     RT
-
+*/
 drw8_0x3C:
     PX00
     PX11
     PX11
     PX00
     RT
-
+/*
 drw8_0x3D:
     PX00
     PX11
@@ -855,14 +860,14 @@ drw8_0x4B:
     PX10
     PX11
     RT
-
+*/
 drw8_0x4C:
     PX01
     PX00
     PX11
     PX00
     RT
-
+/*
 drw8_0x4D:
     PX01
     PX00
@@ -953,14 +958,14 @@ drw8_0x59:
     PX10
     PX01
     RT
-
+*/
 drw8_0x5A:
     PX01
     PX01
     PX10
     PX10
     RT
-
+/*
 drw8_0x5B:
     PX01
     PX01
@@ -995,98 +1000,98 @@ drw8_0x5F:
     PX11
     PX11
     RT
-
+*/
 drw8_0x60:
     PX01
     PX10
     PX00
     PX00
     RT
-
+/*
 drw8_0x61:
     PX01
     PX10
     PX00
     PX01
     RT
-
+*/
 drw8_0x62:
     PX01
     PX10
     PX00
     PX10
     RT
-
+/*
 drw8_0x63:
     PX01
     PX10
     PX00
     PX11
     RT
-
+*/
 drw8_0x64:
     PX01
     PX10
     PX01
     PX00
     RT
-
+/*
 drw8_0x65:
     PX01
     PX10
     PX01
     PX01
     RT
-
+*/
 drw8_0x66:
     PX01
     PX10
     PX01
     PX10
     RT
-
+/*
 drw8_0x67:
     PX01
     PX10
     PX01
     PX11
     RT
-
+*/
 drw8_0x68:
     PX01
     PX10
     PX10
     PX00
     RT
-
+/*
 drw8_0x69:
     PX01
     PX10
     PX10
     PX01
     RT
-
+*/
 drw8_0x6A:
     PX01
     PX10
     PX10
     PX10
     RT
-
+/*
 drw8_0x6B:
     PX01
     PX10
     PX10
     PX11
     RT
-
+*/
 drw8_0x6C:
     PX01
     PX10
     PX11
     PX00
     RT
-
+/*
 drw8_0x6D:
     PX01
     PX10
@@ -1107,14 +1112,14 @@ drw8_0x6F:
     PX11
     PX11
     RT
-
+*/
 drw8_0x70:
     PX01
     PX11
     PX00
     PX00
     RT
-
+/*
 drw8_0x71:
     PX01
     PX11
@@ -1149,98 +1154,98 @@ drw8_0x75:
     PX01
     PX01
     RT
-
+*/
 drw8_0x76:
     PX01
     PX11
     PX01
     PX10
     RT
-
+/*
 drw8_0x77:
     PX01
     PX11
     PX01
     PX11
     RT
-
+*/
 drw8_0x78:
     PX01
     PX11
     PX10
     PX00
     RT
-
+/*
 drw8_0x79:
     PX01
     PX11
     PX10
     PX01
     RT
-
+*/
 drw8_0x7A:
     PX01
     PX11
     PX10
     PX10
     RT
-
+/*
 drw8_0x7B:
     PX01
     PX11
     PX10
     PX11
     RT
-
+*/
 drw8_0x7C:
     PX01
     PX11
     PX11
     PX00
     RT
-
+/*
 drw8_0x7D:
     PX01
     PX11
     PX11
     PX01
     RT
-
+*/
 drw8_0x7E:
     PX01
     PX11
     PX11
     PX10
     RT
-
+/*
 drw8_0x7F:
     PX01
     PX11
     PX11
     PX11
     RT
-
+*/
 drw8_0x80:
     PX10
     PX00
     PX00
     PX00
     RT
-
+/*
 drw8_0x81:
     PX10
     PX00
     PX00
     PX01
     RT
-
+*/
 drw8_0x82:
     PX10
     PX00
     PX00
     PX10
     RT
-
+/*
 drw8_0x83:
     PX10
     PX00
@@ -1303,14 +1308,14 @@ drw8_0x8B:
     PX10
     PX11
     RT
-
+*/
 drw8_0x8C:
     PX10
     PX00
     PX11
     PX00
     RT
-
+/*
 drw8_0x8D:
     PX10
     PX00
@@ -1387,14 +1392,14 @@ drw8_0x97:
     PX01
     PX11
     RT
-
+*/
 drw8_0x98:
     PX10
     PX01
     PX10
     PX00
     RT
-
+/*
 drw8_0x99:
     PX10
     PX01
@@ -1429,14 +1434,14 @@ drw8_0x9D:
     PX11
     PX01
     RT
-
+*/
 drw8_0x9E:
     PX10
     PX01
     PX11
     PX10
     RT
-
+/*
 drw8_0x9F:
     PX10
     PX01
@@ -1485,14 +1490,14 @@ drw8_0xA5:
     PX01
     PX01
     RT
-
+*/
 drw8_0xA6:
     PX10
     PX10
     PX01
     PX10
     RT
-
+/*
 drw8_0xA7:
     PX10
     PX10
@@ -1527,14 +1532,14 @@ drw8_0xAB:
     PX10
     PX11
     RT
-
+*/
 drw8_0xAC:
     PX10
     PX10
     PX11
     PX00
     RT
-
+/*
 drw8_0xAD:
     PX10
     PX10
@@ -1667,14 +1672,14 @@ drw8_0xBF:
     PX11
     PX11
     RT
-
+*/
 drw8_0xC0:
     PX11
     PX00
     PX00
     PX00
     RT
-
+/*
 drw8_0xC1:
     PX11
     PX00
@@ -1709,14 +1714,14 @@ drw8_0xC5:
     PX01
     PX01
     RT
-
+*/
 drw8_0xC6:
     PX11
     PX00
     PX01
     PX10
     RT
-
+/*
 drw8_0xC7:
     PX11
     PX00
@@ -1751,42 +1756,42 @@ drw8_0xCB:
     PX10
     PX11
     RT
-
+*/
 drw8_0xCC:
     PX11
     PX00
     PX11
     PX00
     RT
-
+/*
 drw8_0xCD:
     PX11
     PX00
     PX11
     PX01
     RT
-
+*/
 drw8_0xCE:
     PX11
     PX00
     PX11
     PX10
     RT
-
+/*
 drw8_0xCF:
     PX11
     PX00
     PX11
     PX11
     RT
-
+*/
 drw8_0xD0:
     PX11
     PX01
     PX00
     PX00
     RT
-
+/*
 drw8_0xD1:
     PX11
     PX01
@@ -1821,28 +1826,28 @@ drw8_0xD5:
     PX01
     PX01
     RT
-
+*/
 drw8_0xD6:
     PX11
     PX01
     PX01
     PX10
     RT
-
+/*
 drw8_0xD7:
     PX11
     PX01
     PX01
     PX11
     RT
-
+*/
 drw8_0xD8:
     PX11
     PX01
     PX10
     PX00
     RT
-
+/*
 drw8_0xD9:
     PX11
     PX01
@@ -1863,42 +1868,42 @@ drw8_0xDB:
     PX10
     PX11
     RT
-
+*/
 drw8_0xDC:
     PX11
     PX01
     PX11
     PX00
     RT
-
+/*
 drw8_0xDD:
     PX11
     PX01
     PX11
     PX01
     RT
-
+*/
 drw8_0xDE:
     PX11
     PX01
     PX11
     PX10
     RT
-
+/*
 drw8_0xDF:
     PX11
     PX01
     PX11
     PX11
     RT
-
+*/
 drw8_0xE0:
     PX11
     PX10
     PX00
     PX00
     RT
-
+/*
 drw8_0xE1:
     PX11
     PX10
@@ -1933,14 +1938,14 @@ drw8_0xE5:
     PX01
     PX01
     RT
-
+*/
 drw8_0xE6:
     PX11
     PX10
     PX01
     PX10
     RT
-
+/*
 drw8_0xE7:
     PX11
     PX10
@@ -1989,28 +1994,28 @@ drw8_0xED:
     PX11
     PX01
     RT
-
+*/
 drw8_0xEE:
     PX11
     PX10
     PX11
     PX10
     RT
-
+/*
 drw8_0xEF:
     PX11
     PX10
     PX11
     PX11
     RT
-
+*/
 drw8_0xF0:
     PX11
     PX11
     PX00
     PX00
     RT
-
+/*
 drw8_0xF1:
     PX11
     PX11
@@ -2045,28 +2050,28 @@ drw8_0xF5:
     PX01
     PX01
     RT
-
+*/
 drw8_0xF6:
     PX11
     PX11
     PX01
     PX10
     RT
-
+/*
 drw8_0xF7:
     PX11
     PX11
     PX01
     PX11
     RT
-
+*/
 drw8_0xF8:
     PX11
     PX11
     PX10
     PX00
     RT
-
+/*
 drw8_0xF9:
     PX11
     PX11
@@ -2087,21 +2092,21 @@ drw8_0xFB:
     PX10
     PX11
     RT
-
+*/
 drw8_0xFC:
     PX11
     PX11
     PX11
     PX00
     RT
-
+/*
 drw8_0xFD:
     PX11
     PX11
     PX11
     PX01
     RT
-
+*/
 drw8_0xFE:
     PX11
     PX11

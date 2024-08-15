@@ -189,7 +189,7 @@ void init_screen() {
     }
 }
 
-extern void set_dynamic_code();
+extern void draw_pixels();
 extern void run_dynamic_code();
 extern void write_pixels();
 extern void waste_time0();
@@ -204,7 +204,7 @@ void prepare_scan_line(uint16_t row) {
     for (col = 0; col < 16/*NUM_COLS*/; col++) {
         uint16_t ch = (uint16_t)(*char_indexes++); // get one character code
         uint16_t def = (uint16_t)(char_defs[ch]); // get scan line bits for character
-        SetCodePiece set_code = (SetCodePiece)(((uint32_t)set_dynamic_code) + (def * 10)); // 5 HW instructions per column
+        SetCodePiece set_code = (SetCodePiece)(((uint32_t)draw_pixels) + (def * 10)); // 5 HW instructions per column
         (*set_code)(0xC09CC09C, 0xC01CC09C, 0xC09CC01C, 0xC01CC01C, dyn_code);
         dyn_code += 16; // 8 HW instructions per char column
     }

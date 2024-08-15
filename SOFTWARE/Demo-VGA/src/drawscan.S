@@ -1,21 +1,18 @@
-// File: rundyn.S
-// Purpose: Run dynamic assembler code
+// File: drawscan.S
+// Purpose: Draw a scan line
 // Copyright (c) 2024 by Curtis Whitley
 //
 // License: Apache
 //
 
-#define USE_BSHR    0xC01C  /* c.sw x15,0(x8)   store video-out bit into GPIO BSHR */
-#define USE_BCR     0xC09C  /* c.sw x15,0(x9)   store video-out bit into GPIO BCR */
-
 // ZR x0    zero (always)
 // RA x1    return address
 // SP x2    stack pointer
 
-// a0 x10   ((USE_BCR  << 0) | (USE_BCR  << 16))  pixels __ (0xC09CC09C)
-// a1 x11   ((USE_BCR  << 0) | (USE_BSHR << 16))  pixels _* (0xC01CC09C)
-// a2 x12   ((USE_BSHR << 0) | (USE_BCR  << 16))  pixels *_ (0xC09CC01C)
-// a3 x13   ((USE_BSHR << 0) | (USE_BSHR << 16))  pixels ** (0xC01CC01C)
+// a0 x10   
+// a1 x11   
+// a2 x12   
+// a3 x13   
 // a4 x14   address of dynamic code for 1 glyph scan line (8 pixels)
 // a5 x15   video-out bit value in GPIO (0x00000004)
 // a6 x16
@@ -23,7 +20,7 @@
 
 // s0 x8    address of GPIO BSHR (0x40011010)
 // s1 x9    address of GPIO BCR (0x40011014)
-// s2 x18
+// s2 x18   
 // s3 x19
 // s4 x20
 // s5 x21
