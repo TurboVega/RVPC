@@ -2360,26 +2360,9 @@
 
 //--------------------------------
 
-#define USE_BSHR    0xC01C  /* c.sw x15,0(x8)   store video-out bit into GPIO BSHR */
-#define USE_BCR     0xC09C  /* c.sw x15,0(x9)   store video-out bit into GPIO BCR */
 #define RET         0x8082  /* c.jr x1          return from subroutine */
 
-#define WRITE_1_PIXEL(bit) (bit ? USE_BSHR : USE_BCR)
-
-#define WRITE_8_PIXELS(bits) \
-    { \
-        WRITE_1_PIXEL(bits & 0x80), \
-        WRITE_1_PIXEL(bits & 0x40), \
-        WRITE_1_PIXEL(bits & 0x20), \
-        WRITE_1_PIXEL(bits & 0x10), \
-        WRITE_1_PIXEL(bits & 0x08), \
-        WRITE_1_PIXEL(bits & 0x04), \
-        WRITE_1_PIXEL(bits & 0x02), \
-        WRITE_1_PIXEL(bits & 0x01), \
-        RET \
-    }
-
-#define CHAR_LINE(n, c) WRITE_8_PIXELS(CHAR_DEF_##c##_##n)
+#define CHAR_LINE(n, c) \(CHAR_DEF_##c##_##n)
 
 #define CHARSET_LINE(n) \
     { \
