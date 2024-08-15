@@ -172,10 +172,13 @@ void PWM_Config(TIM_TypeDef *TIM, uint8_t channel, uint16_t pulse, uint16_t mode
 #endif
 
 void init_screen() {
-    uint8_t ch = 0;
+    uint8_t ch = 0x20;
     for (uint8_t row = 0; row < NUM_ROWS; row++) {
         for (uint8_t col = 0; col < NUM_COLS; col++) {
             screen_chars[row][col] = ch++;
+            if (ch > 0x7E) {
+                ch = 0x20;
+            }
         }
     }
 }
@@ -192,7 +195,7 @@ void write_scan_line(uint16_t row) {
     register uint32_t bshr = (uint32_t)(&VGA_DATA_GPIO->BSHR);
     register uint32_t bcr = (uint32_t)(&VGA_DATA_GPIO->BCR);
 
-    for (col = 0; col < 16/*NUM_COLS*/; col++) {
+    for (col = 0; col < 8/*NUM_COLS*/; col++) {
         uint16_t ch = (uint16_t)(*char_indexes++); // get one character code
         Write8Pixels write = char_defs[ch]; // get function ptr for writing scan line of character
         (*write)(video_out, bshr, bcr);
@@ -269,12 +272,12 @@ void TIM2_IRQHandler(void)   __attribute__((interrupt("WCH-Interrupt-fast")));
 void TIM2_IRQHandler(void) {
 
 	uint32_t current_row = VGA_VSYNC_TIM->CNT;
-	if (current_row <= VGA_VBACK_PORCH || current_row >= (VGA_VPERIOD - VGA_VFRONT_PORCH)) {
+	if (current_row < VGA_VBACK_PORCH || current_row >= (VGA_VPERIOD - VGA_VFRONT_PORCH)) {
 		goto exit;
 	}
 
     waste_time0();
-    write_scan_line(current_row);
+    write_scan_line((current_row - VGA_VBACK_PORCH) >> 1);
 
 exit:
 	VGA_DATA_GPIO->BCR = VGA_DATA_PIN;

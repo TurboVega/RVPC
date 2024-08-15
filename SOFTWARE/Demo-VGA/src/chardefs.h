@@ -17,8 +17,8 @@
 
 #include <stdint.h>
 
-#define NUM_COLS        31
-#define NUM_ROWS        39
+#define NUM_COLS        30
+#define NUM_ROWS        37
 #define CHAR_WIDTH       8
 #define CHAR_HEIGHT      8
 
