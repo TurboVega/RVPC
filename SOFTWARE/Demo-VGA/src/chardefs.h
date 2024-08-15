@@ -1,4 +1,4 @@
-// File: chardefs.S
+// File: chardefs.h
 // Purpose: Character glyph definitions
 //
 // This file uses a series of macros so that it can group the pixel bits of
@@ -12,70 +12,15 @@
 // #1 bytes (for characters #00..#FF), and so on.
 //
 
-    .section .data
-    .align 4
+#ifndef CHARDEFS_H
+#define CHARDEFS_H
 
-    .global   character_defs
+#include <stdint.h>
 
-    .macro SET_PIXEL
-    c.sw x15,0(x9)      // clear a pixel
-    .endm
-
-    .macro CLR_PIXEL
-    c.sw x15,0(x8)      // set a pixel
-    .endm
-
-    .macro WRITE_8_PIXELS val
-        .if val & 0x80
-            SET_PIXEL
-        .else
-            CLR_PIXEL
-        .endif
-
-        .if val & 0x40
-            SET_PIXEL
-        .else
-            CLR_PIXEL
-        .endif
-
-        .if val & 0x20
-            SET_PIXEL
-        .else
-            CLR_PIXEL
-        .endif
-
-        .if val & 0x10
-            SET_PIXEL
-        .else
-            CLR_PIXEL
-        .endif
-
-        .if val & 0x08
-            SET_PIXEL
-        .else
-            CLR_PIXEL
-        .endif
-
-        .if val & 0x04
-            SET_PIXEL
-        .else
-            CLR_PIXEL
-        .endif
-
-        .if val & 0x02
-            SET_PIXEL
-        .else
-            CLR_PIXEL
-        .endif
-
-        .if val & 0x01
-            SET_PIXEL
-        .else
-            CLR_PIXEL
-        .endif
-
-        c.jr x1     // return
-    .endm
+#define NUM_COLS        31
+#define NUM_ROWS        39
+#define CHAR_WIDTH       8
+#define CHAR_HEIGHT      8
 
 //--------------------------------
 
@@ -2415,293 +2360,327 @@
 
 //--------------------------------
 
-    .macro CHAR_LINE n, c
-        WRITE_8_PIXELS CHAR_DEF_c_n
-    .endm
+#define USE_BSHR    0xC01C  /* c.sw x15,0(x8)   store video-out bit into GPIO BSHR */
+#define USE_BCR     0xC09C  /* c.sw x15,0(x9)   store video-out bit into GPIO BCR */
+#define RET         0x8082  /* c.jr x1          return from subroutine */
 
-    .macro CHARSET_LINE n
-        CHAR_LINE \n, 0x00
-        CHAR_LINE \n, 0x01
-        CHAR_LINE \n, 0x02
-        CHAR_LINE \n, 0x03
-        CHAR_LINE \n, 0x04
-        CHAR_LINE \n, 0x05
-        CHAR_LINE \n, 0x06
-        CHAR_LINE \n, 0x07
-        CHAR_LINE \n, 0x08
-        CHAR_LINE \n, 0x09
-        CHAR_LINE \n, 0x0A
-        CHAR_LINE \n, 0x0B
-        CHAR_LINE \n, 0x0C
-        CHAR_LINE \n, 0x0D
-        CHAR_LINE \n, 0x0E
-        CHAR_LINE \n, 0x0F
-        
-        CHAR_LINE \n, 0x10
-        CHAR_LINE \n, 0x11
-        CHAR_LINE \n, 0x12
-        CHAR_LINE \n, 0x13
-        CHAR_LINE \n, 0x14
-        CHAR_LINE \n, 0x15
-        CHAR_LINE \n, 0x16
-        CHAR_LINE \n, 0x17
-        CHAR_LINE \n, 0x18
-        CHAR_LINE \n, 0x19
-        CHAR_LINE \n, 0x1A
-        CHAR_LINE \n, 0x1B
-        CHAR_LINE \n, 0x1C
-        CHAR_LINE \n, 0x1D
-        CHAR_LINE \n, 0x1E
-        CHAR_LINE \n, 0x1F
-        
-        CHAR_LINE \n, 0x20
-        CHAR_LINE \n, 0x21
-        CHAR_LINE \n, 0x22
-        CHAR_LINE \n, 0x23
-        CHAR_LINE \n, 0x24
-        CHAR_LINE \n, 0x25
-        CHAR_LINE \n, 0x26
-        CHAR_LINE \n, 0x27
-        CHAR_LINE \n, 0x28
-        CHAR_LINE \n, 0x29
-        CHAR_LINE \n, 0x2A
-        CHAR_LINE \n, 0x2B
-        CHAR_LINE \n, 0x2C
-        CHAR_LINE \n, 0x2D
-        CHAR_LINE \n, 0x2E
-        CHAR_LINE \n, 0x2F
-        
-        CHAR_LINE \n, 0x30
-        CHAR_LINE \n, 0x31
-        CHAR_LINE \n, 0x32
-        CHAR_LINE \n, 0x33
-        CHAR_LINE \n, 0x34
-        CHAR_LINE \n, 0x35
-        CHAR_LINE \n, 0x36
-        CHAR_LINE \n, 0x37
-        CHAR_LINE \n, 0x38
-        CHAR_LINE \n, 0x39
-        CHAR_LINE \n, 0x3A
-        CHAR_LINE \n, 0x3B
-        CHAR_LINE \n, 0x3C
-        CHAR_LINE \n, 0x3D
-        CHAR_LINE \n, 0x3E
-        CHAR_LINE \n, 0x3F
-        
-        CHAR_LINE \n, 0x40
-        CHAR_LINE \n, 0x41
-        CHAR_LINE \n, 0x42
-        CHAR_LINE \n, 0x43
-        CHAR_LINE \n, 0x44
-        CHAR_LINE \n, 0x45
-        CHAR_LINE \n, 0x46
-        CHAR_LINE \n, 0x47
-        CHAR_LINE \n, 0x48
-        CHAR_LINE \n, 0x49
-        CHAR_LINE \n, 0x4A
-        CHAR_LINE \n, 0x4B
-        CHAR_LINE \n, 0x4C
-        CHAR_LINE \n, 0x4D
-        CHAR_LINE \n, 0x4E
-        CHAR_LINE \n, 0x4F
-        
-        CHAR_LINE \n, 0x50
-        CHAR_LINE \n, 0x51
-        CHAR_LINE \n, 0x52
-        CHAR_LINE \n, 0x53
-        CHAR_LINE \n, 0x54
-        CHAR_LINE \n, 0x55
-        CHAR_LINE \n, 0x56
-        CHAR_LINE \n, 0x57
-        CHAR_LINE \n, 0x58
-        CHAR_LINE \n, 0x59
-        CHAR_LINE \n, 0x5A
-        CHAR_LINE \n, 0x5B
-        CHAR_LINE \n, 0x5C
-        CHAR_LINE \n, 0x5D
-        CHAR_LINE \n, 0x5E
-        CHAR_LINE \n, 0x5F
-        
-        CHAR_LINE \n, 0x60
-        CHAR_LINE \n, 0x61
-        CHAR_LINE \n, 0x62
-        CHAR_LINE \n, 0x63
-        CHAR_LINE \n, 0x64
-        CHAR_LINE \n, 0x65
-        CHAR_LINE \n, 0x66
-        CHAR_LINE \n, 0x67
-        CHAR_LINE \n, 0x68
-        CHAR_LINE \n, 0x69
-        CHAR_LINE \n, 0x6A
-        CHAR_LINE \n, 0x6B
-        CHAR_LINE \n, 0x6C
-        CHAR_LINE \n, 0x6D
-        CHAR_LINE \n, 0x6E
-        CHAR_LINE \n, 0x6F
-        
-        CHAR_LINE \n, 0x70
-        CHAR_LINE \n, 0x71
-        CHAR_LINE \n, 0x72
-        CHAR_LINE \n, 0x73
-        CHAR_LINE \n, 0x74
-        CHAR_LINE \n, 0x75
-        CHAR_LINE \n, 0x76
-        CHAR_LINE \n, 0x77
-        CHAR_LINE \n, 0x78
-        CHAR_LINE \n, 0x79
-        CHAR_LINE \n, 0x7A
-        CHAR_LINE \n, 0x7B
-        CHAR_LINE \n, 0x7C
-        CHAR_LINE \n, 0x7D
-        CHAR_LINE \n, 0x7E
-        CHAR_LINE \n, 0x7F
-        
-        CHAR_LINE \n, 0x80
-        CHAR_LINE \n, 0x81
-        CHAR_LINE \n, 0x82
-        CHAR_LINE \n, 0x83
-        CHAR_LINE \n, 0x84
-        CHAR_LINE \n, 0x85
-        CHAR_LINE \n, 0x86
-        CHAR_LINE \n, 0x87
-        CHAR_LINE \n, 0x88
-        CHAR_LINE \n, 0x89
-        CHAR_LINE \n, 0x8A
-        CHAR_LINE \n, 0x8B
-        CHAR_LINE \n, 0x8C
-        CHAR_LINE \n, 0x8D
-        CHAR_LINE \n, 0x8E
-        CHAR_LINE \n, 0x8F
-        
-        CHAR_LINE \n, 0x90
-        CHAR_LINE \n, 0x91
-        CHAR_LINE \n, 0x92
-        CHAR_LINE \n, 0x93
-        CHAR_LINE \n, 0x94
-        CHAR_LINE \n, 0x95
-        CHAR_LINE \n, 0x96
-        CHAR_LINE \n, 0x97
-        CHAR_LINE \n, 0x98
-        CHAR_LINE \n, 0x99
-        CHAR_LINE \n, 0x9A
-        CHAR_LINE \n, 0x9B
-        CHAR_LINE \n, 0x9C
-        CHAR_LINE \n, 0x9D
-        CHAR_LINE \n, 0x9E
-        CHAR_LINE \n, 0x9F
-        
-        CHAR_LINE \n, 0xA0
-        CHAR_LINE \n, 0xA1
-        CHAR_LINE \n, 0xA2
-        CHAR_LINE \n, 0xA3
-        CHAR_LINE \n, 0xA4
-        CHAR_LINE \n, 0xA5
-        CHAR_LINE \n, 0xA6
-        CHAR_LINE \n, 0xA7
-        CHAR_LINE \n, 0xA8
-        CHAR_LINE \n, 0xA9
-        CHAR_LINE \n, 0xAA
-        CHAR_LINE \n, 0xAB
-        CHAR_LINE \n, 0xAC
-        CHAR_LINE \n, 0xAD
-        CHAR_LINE \n, 0xAE
-        CHAR_LINE \n, 0xAF
-        
-        CHAR_LINE \n, 0xB0
-        CHAR_LINE \n, 0xB1
-        CHAR_LINE \n, 0xB2
-        CHAR_LINE \n, 0xB3
-        CHAR_LINE \n, 0xB4
-        CHAR_LINE \n, 0xB5
-        CHAR_LINE \n, 0xB6
-        CHAR_LINE \n, 0xB7
-        CHAR_LINE \n, 0xB8
-        CHAR_LINE \n, 0xB9
-        CHAR_LINE \n, 0xBA
-        CHAR_LINE \n, 0xBB
-        CHAR_LINE \n, 0xBC
-        CHAR_LINE \n, 0xBD
-        CHAR_LINE \n, 0xBE
-        CHAR_LINE \n, 0xBF
-        
-        CHAR_LINE \n, 0xC0
-        CHAR_LINE \n, 0xC1
-        CHAR_LINE \n, 0xC2
-        CHAR_LINE \n, 0xC3
-        CHAR_LINE \n, 0xC4
-        CHAR_LINE \n, 0xC5
-        CHAR_LINE \n, 0xC6
-        CHAR_LINE \n, 0xC7
-        CHAR_LINE \n, 0xC8
-        CHAR_LINE \n, 0xC9
-        CHAR_LINE \n, 0xCA
-        CHAR_LINE \n, 0xCB
-        CHAR_LINE \n, 0xCC
-        CHAR_LINE \n, 0xCD
-        CHAR_LINE \n, 0xCE
-        CHAR_LINE \n, 0xCF
-        
-        CHAR_LINE \n, 0xD0
-        CHAR_LINE \n, 0xD1
-        CHAR_LINE \n, 0xD2
-        CHAR_LINE \n, 0xD3
-        CHAR_LINE \n, 0xD4
-        CHAR_LINE \n, 0xD5
-        CHAR_LINE \n, 0xD6
-        CHAR_LINE \n, 0xD7
-        CHAR_LINE \n, 0xD8
-        CHAR_LINE \n, 0xD9
-        CHAR_LINE \n, 0xDA
-        CHAR_LINE \n, 0xDB
-        CHAR_LINE \n, 0xDC
-        CHAR_LINE \n, 0xDD
-        CHAR_LINE \n, 0xDE
-        CHAR_LINE \n, 0xDF
-        
-        CHAR_LINE \n, 0xE0
-        CHAR_LINE \n, 0xE1
-        CHAR_LINE \n, 0xE2
-        CHAR_LINE \n, 0xE3
-        CHAR_LINE \n, 0xE4
-        CHAR_LINE \n, 0xE5
-        CHAR_LINE \n, 0xE6
-        CHAR_LINE \n, 0xE7
-        CHAR_LINE \n, 0xE8
-        CHAR_LINE \n, 0xE9
-        CHAR_LINE \n, 0xEA
-        CHAR_LINE \n, 0xEB
-        CHAR_LINE \n, 0xEC
-        CHAR_LINE \n, 0xED
-        CHAR_LINE \n, 0xEE
-        CHAR_LINE \n, 0xEF
-        
-        CHAR_LINE \n, 0xF0
-        CHAR_LINE \n, 0xF1
-        CHAR_LINE \n, 0xF2
-        CHAR_LINE \n, 0xF3
-        CHAR_LINE \n, 0xF4
-        CHAR_LINE \n, 0xF5
-        CHAR_LINE \n, 0xF6
-        CHAR_LINE \n, 0xF7
-        CHAR_LINE \n, 0xF8
-        CHAR_LINE \n, 0xF9
-        CHAR_LINE \n, 0xFA
-        CHAR_LINE \n, 0xFB
-        CHAR_LINE \n, 0xFC
-        CHAR_LINE \n, 0xFD
-        CHAR_LINE \n, 0xFE
-        CHAR_LINE \n, 0xFF
-    .endm
+#define WRITE_1_PIXEL(bit) (bit ? USE_BSHR : USE_BCR)
+
+#define WRITE_8_PIXELS(bits) \
+    { \
+        WRITE_1_PIXEL(bits & 0x80), \
+        WRITE_1_PIXEL(bits & 0x40), \
+        WRITE_1_PIXEL(bits & 0x20), \
+        WRITE_1_PIXEL(bits & 0x10), \
+        WRITE_1_PIXEL(bits & 0x08), \
+        WRITE_1_PIXEL(bits & 0x04), \
+        WRITE_1_PIXEL(bits & 0x02), \
+        WRITE_1_PIXEL(bits & 0x01), \
+        RET \
+    }
+
+#define CHAR_LINE(n, c) WRITE_8_PIXELS(CHAR_DEF_##c##_##n)
+
+#define CHARSET_LINE(n) \
+    { \
+        CHAR_LINE(n, 0x00), \
+        CHAR_LINE(n, 0x01), \
+        CHAR_LINE(n, 0x02), \
+        CHAR_LINE(n, 0x03), \
+        CHAR_LINE(n, 0x04), \
+        CHAR_LINE(n, 0x05), \
+        CHAR_LINE(n, 0x06), \
+        CHAR_LINE(n, 0x07), \
+        CHAR_LINE(n, 0x08), \
+        CHAR_LINE(n, 0x09), \
+        CHAR_LINE(n, 0x0A), \
+        CHAR_LINE(n, 0x0B), \
+        CHAR_LINE(n, 0x0C), \
+        CHAR_LINE(n, 0x0D), \
+        CHAR_LINE(n, 0x0E), \
+        CHAR_LINE(n, 0x0F), \
+        \
+        CHAR_LINE(n, 0x10), \
+        CHAR_LINE(n, 0x11), \
+        CHAR_LINE(n, 0x12), \
+        CHAR_LINE(n, 0x13), \
+        CHAR_LINE(n, 0x14), \
+        CHAR_LINE(n, 0x15), \
+        CHAR_LINE(n, 0x16), \
+        CHAR_LINE(n, 0x17), \
+        CHAR_LINE(n, 0x18), \
+        CHAR_LINE(n, 0x19), \
+        CHAR_LINE(n, 0x1A), \
+        CHAR_LINE(n, 0x1B), \
+        CHAR_LINE(n, 0x1C), \
+        CHAR_LINE(n, 0x1D), \
+        CHAR_LINE(n, 0x1E), \
+        CHAR_LINE(n, 0x1F), \
+        \
+        CHAR_LINE(n, 0x20), \
+        CHAR_LINE(n, 0x21), \
+        CHAR_LINE(n, 0x22), \
+        CHAR_LINE(n, 0x23), \
+        CHAR_LINE(n, 0x24), \
+        CHAR_LINE(n, 0x25), \
+        CHAR_LINE(n, 0x26), \
+        CHAR_LINE(n, 0x27), \
+        CHAR_LINE(n, 0x28), \
+        CHAR_LINE(n, 0x29), \
+        CHAR_LINE(n, 0x2A), \
+        CHAR_LINE(n, 0x2B), \
+        CHAR_LINE(n, 0x2C), \
+        CHAR_LINE(n, 0x2D), \
+        CHAR_LINE(n, 0x2E), \
+        CHAR_LINE(n, 0x2F), \
+        \
+        CHAR_LINE(n, 0x30), \
+        CHAR_LINE(n, 0x31), \
+        CHAR_LINE(n, 0x32), \
+        CHAR_LINE(n, 0x33), \
+        CHAR_LINE(n, 0x34), \
+        CHAR_LINE(n, 0x35), \
+        CHAR_LINE(n, 0x36), \
+        CHAR_LINE(n, 0x37), \
+        CHAR_LINE(n, 0x38), \
+        CHAR_LINE(n, 0x39), \
+        CHAR_LINE(n, 0x3A), \
+        CHAR_LINE(n, 0x3B), \
+        CHAR_LINE(n, 0x3C), \
+        CHAR_LINE(n, 0x3D), \
+        CHAR_LINE(n, 0x3E), \
+        CHAR_LINE(n, 0x3F), \
+        \
+        CHAR_LINE(n, 0x40), \
+        CHAR_LINE(n, 0x41), \
+        CHAR_LINE(n, 0x42), \
+        CHAR_LINE(n, 0x43), \
+        CHAR_LINE(n, 0x44), \
+        CHAR_LINE(n, 0x45), \
+        CHAR_LINE(n, 0x46), \
+        CHAR_LINE(n, 0x47), \
+        CHAR_LINE(n, 0x48), \
+        CHAR_LINE(n, 0x49), \
+        CHAR_LINE(n, 0x4A), \
+        CHAR_LINE(n, 0x4B), \
+        CHAR_LINE(n, 0x4C), \
+        CHAR_LINE(n, 0x4D), \
+        CHAR_LINE(n, 0x4E), \
+        CHAR_LINE(n, 0x4F), \
+        \
+        CHAR_LINE(n, 0x50), \
+        CHAR_LINE(n, 0x51), \
+        CHAR_LINE(n, 0x52), \
+        CHAR_LINE(n, 0x53), \
+        CHAR_LINE(n, 0x54), \
+        CHAR_LINE(n, 0x55), \
+        CHAR_LINE(n, 0x56), \
+        CHAR_LINE(n, 0x57), \
+        CHAR_LINE(n, 0x58), \
+        CHAR_LINE(n, 0x59), \
+        CHAR_LINE(n, 0x5A), \
+        CHAR_LINE(n, 0x5B), \
+        CHAR_LINE(n, 0x5C), \
+        CHAR_LINE(n, 0x5D), \
+        CHAR_LINE(n, 0x5E), \
+        CHAR_LINE(n, 0x5F), \
+        \
+        CHAR_LINE(n, 0x60), \
+        CHAR_LINE(n, 0x61), \
+        CHAR_LINE(n, 0x62), \
+        CHAR_LINE(n, 0x63), \
+        CHAR_LINE(n, 0x64), \
+        CHAR_LINE(n, 0x65), \
+        CHAR_LINE(n, 0x66), \
+        CHAR_LINE(n, 0x67), \
+        CHAR_LINE(n, 0x68), \
+        CHAR_LINE(n, 0x69), \
+        CHAR_LINE(n, 0x6A), \
+        CHAR_LINE(n, 0x6B), \
+        CHAR_LINE(n, 0x6C), \
+        CHAR_LINE(n, 0x6D), \
+        CHAR_LINE(n, 0x6E), \
+        CHAR_LINE(n, 0x6F), \
+        \
+        CHAR_LINE(n, 0x70), \
+        CHAR_LINE(n, 0x71), \
+        CHAR_LINE(n, 0x72), \
+        CHAR_LINE(n, 0x73), \
+        CHAR_LINE(n, 0x74), \
+        CHAR_LINE(n, 0x75), \
+        CHAR_LINE(n, 0x76), \
+        CHAR_LINE(n, 0x77), \
+        CHAR_LINE(n, 0x78), \
+        CHAR_LINE(n, 0x79), \
+        CHAR_LINE(n, 0x7A), \
+        CHAR_LINE(n, 0x7B), \
+        CHAR_LINE(n, 0x7C), \
+        CHAR_LINE(n, 0x7D), \
+        CHAR_LINE(n, 0x7E), \
+        CHAR_LINE(n, 0x7F), \
+        \
+        CHAR_LINE(n, 0x80), \
+        CHAR_LINE(n, 0x81), \
+        CHAR_LINE(n, 0x82), \
+        CHAR_LINE(n, 0x83), \
+        CHAR_LINE(n, 0x84), \
+        CHAR_LINE(n, 0x85), \
+        CHAR_LINE(n, 0x86), \
+        CHAR_LINE(n, 0x87), \
+        CHAR_LINE(n, 0x88), \
+        CHAR_LINE(n, 0x89), \
+        CHAR_LINE(n, 0x8A), \
+        CHAR_LINE(n, 0x8B), \
+        CHAR_LINE(n, 0x8C), \
+        CHAR_LINE(n, 0x8D), \
+        CHAR_LINE(n, 0x8E), \
+        CHAR_LINE(n, 0x8F), \
+        \
+        CHAR_LINE(n, 0x90), \
+        CHAR_LINE(n, 0x91), \
+        CHAR_LINE(n, 0x92), \
+        CHAR_LINE(n, 0x93), \
+        CHAR_LINE(n, 0x94), \
+        CHAR_LINE(n, 0x95), \
+        CHAR_LINE(n, 0x96), \
+        CHAR_LINE(n, 0x97), \
+        CHAR_LINE(n, 0x98), \
+        CHAR_LINE(n, 0x99), \
+        CHAR_LINE(n, 0x9A), \
+        CHAR_LINE(n, 0x9B), \
+        CHAR_LINE(n, 0x9C), \
+        CHAR_LINE(n, 0x9D), \
+        CHAR_LINE(n, 0x9E), \
+        CHAR_LINE(n, 0x9F), \
+        \
+        CHAR_LINE(n, 0xA0), \
+        CHAR_LINE(n, 0xA1), \
+        CHAR_LINE(n, 0xA2), \
+        CHAR_LINE(n, 0xA3), \
+        CHAR_LINE(n, 0xA4), \
+        CHAR_LINE(n, 0xA5), \
+        CHAR_LINE(n, 0xA6), \
+        CHAR_LINE(n, 0xA7), \
+        CHAR_LINE(n, 0xA8), \
+        CHAR_LINE(n, 0xA9), \
+        CHAR_LINE(n, 0xAA), \
+        CHAR_LINE(n, 0xAB), \
+        CHAR_LINE(n, 0xAC), \
+        CHAR_LINE(n, 0xAD), \
+        CHAR_LINE(n, 0xAE), \
+        CHAR_LINE(n, 0xAF), \
+        \
+        CHAR_LINE(n, 0xB0), \
+        CHAR_LINE(n, 0xB1), \
+        CHAR_LINE(n, 0xB2), \
+        CHAR_LINE(n, 0xB3), \
+        CHAR_LINE(n, 0xB4), \
+        CHAR_LINE(n, 0xB5), \
+        CHAR_LINE(n, 0xB6), \
+        CHAR_LINE(n, 0xB7), \
+        CHAR_LINE(n, 0xB8), \
+        CHAR_LINE(n, 0xB9), \
+        CHAR_LINE(n, 0xBA), \
+        CHAR_LINE(n, 0xBB), \
+        CHAR_LINE(n, 0xBC), \
+        CHAR_LINE(n, 0xBD), \
+        CHAR_LINE(n, 0xBE), \
+        CHAR_LINE(n, 0xBF), \
+        \
+        CHAR_LINE(n, 0xC0), \
+        CHAR_LINE(n, 0xC1), \
+        CHAR_LINE(n, 0xC2), \
+        CHAR_LINE(n, 0xC3), \
+        CHAR_LINE(n, 0xC4), \
+        CHAR_LINE(n, 0xC5), \
+        CHAR_LINE(n, 0xC6), \
+        CHAR_LINE(n, 0xC7), \
+        CHAR_LINE(n, 0xC8), \
+        CHAR_LINE(n, 0xC9), \
+        CHAR_LINE(n, 0xCA), \
+        CHAR_LINE(n, 0xCB), \
+        CHAR_LINE(n, 0xCC), \
+        CHAR_LINE(n, 0xCD), \
+        CHAR_LINE(n, 0xCE), \
+        CHAR_LINE(n, 0xCF), \
+        \
+        CHAR_LINE(n, 0xD0), \
+        CHAR_LINE(n, 0xD1), \
+        CHAR_LINE(n, 0xD2), \
+        CHAR_LINE(n, 0xD3), \
+        CHAR_LINE(n, 0xD4), \
+        CHAR_LINE(n, 0xD5), \
+        CHAR_LINE(n, 0xD6), \
+        CHAR_LINE(n, 0xD7), \
+        CHAR_LINE(n, 0xD8), \
+        CHAR_LINE(n, 0xD9), \
+        CHAR_LINE(n, 0xDA), \
+        CHAR_LINE(n, 0xDB), \
+        CHAR_LINE(n, 0xDC), \
+        CHAR_LINE(n, 0xDD), \
+        CHAR_LINE(n, 0xDE), \
+        CHAR_LINE(n, 0xDF), \
+        \
+        CHAR_LINE(n, 0xE0), \
+        CHAR_LINE(n, 0xE1), \
+        CHAR_LINE(n, 0xE2), \
+        CHAR_LINE(n, 0xE3), \
+        CHAR_LINE(n, 0xE4), \
+        CHAR_LINE(n, 0xE5), \
+        CHAR_LINE(n, 0xE6), \
+        CHAR_LINE(n, 0xE7), \
+        CHAR_LINE(n, 0xE8), \
+        CHAR_LINE(n, 0xE9), \
+        CHAR_LINE(n, 0xEA), \
+        CHAR_LINE(n, 0xEB), \
+        CHAR_LINE(n, 0xEC), \
+        CHAR_LINE(n, 0xED), \
+        CHAR_LINE(n, 0xEE), \
+        CHAR_LINE(n, 0xEF), \
+        \
+        CHAR_LINE(n, 0xF0), \
+        CHAR_LINE(n, 0xF1), \
+        CHAR_LINE(n, 0xF2), \
+        CHAR_LINE(n, 0xF3), \
+        CHAR_LINE(n, 0xF4), \
+        CHAR_LINE(n, 0xF5), \
+        CHAR_LINE(n, 0xF6), \
+        CHAR_LINE(n, 0xF7), \
+        CHAR_LINE(n, 0xF8), \
+        CHAR_LINE(n, 0xF9), \
+        CHAR_LINE(n, 0xFA), \
+        CHAR_LINE(n, 0xFB), \
+        CHAR_LINE(n, 0xFC), \
+        CHAR_LINE(n, 0xFD), \
+        CHAR_LINE(n, 0xFE), \
+        CHAR_LINE(n, 0xFF) \
+    }
+
+#if DEF_SCREEN_ARRAYS
 
 // These are the character definitions in ROM (flash memory).
 //
-character_defs:
-
-    CHARSET_LINE(0)
-    CHARSET_LINE(1)
-    CHARSET_LINE(2)
-    CHARSET_LINE(3)
-    CHARSET_LINE(4)
-    CHARSET_LINE(5)
-    CHARSET_LINE(6)
+const uint16_t character_defs[8][256] = { 0 };
+/*const uint16_t character_defs[8][256][9] = {
+    CHARSET_LINE(0),
+    CHARSET_LINE(1),
+    CHARSET_LINE(2),
+    CHARSET_LINE(3),
+    CHARSET_LINE(4),
+    CHARSET_LINE(5),
+    CHARSET_LINE(6),
     CHARSET_LINE(7)
+};*/
+
+// These are the screen characters in RAM (read/write memory).
+//
+uint8_t screen_chars[NUM_ROWS][NUM_COLS];
+
+#else
+
+extern const uint16_t character_defs[8][256];//[9];
+extern uint8_t screen_chars[NUM_ROWS][NUM_COLS];
+
+#endif // DEF_SCREEN_ARRAYS
+
+#endif // CHARDEFS_H

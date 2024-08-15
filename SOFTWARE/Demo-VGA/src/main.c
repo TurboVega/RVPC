@@ -1,4 +1,6 @@
 #include <ch32v00x.h>
+#define DEF_SCREEN_ARRAYS 1
+#include "chardefs.h"
 
 void GPIO_Config(GPIO_TypeDef *GPIO_port, uint16_t GPIO_pin, GPIOMode_TypeDef GPIO_mode) {
 	GPIO_InitTypeDef Config = {0};
@@ -195,7 +197,7 @@ extern void waste_time1();
 
 void prepare_scan_line(uint16_t row) {
     uint32_t col;
-    register const uint8_t* char_defs = character_defs[row & 0x7]; // point to array of scan line bits (glyph pixels)
+    register const uint16_t* char_defs = (const uint16_t*) character_defs[row & 0x7]; // point to array of scan line functions
     register const uint8_t* char_indexes = screen_chars[row >> 3]; // point to array of character codes (text line)
     register uint32_t dyn_code = ((uint32_t) write_pixels); // point to 8 HW instructions per char column
 
