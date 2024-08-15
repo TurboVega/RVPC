@@ -1,6 +1,4 @@
 #include <ch32v00x.h>
-#define DEF_SCREEN_ARRAYS 1
-#include "chardefs.h"
 
 void GPIO_Config(GPIO_TypeDef *GPIO_port, uint16_t GPIO_pin, GPIOMode_TypeDef GPIO_mode) {
 	GPIO_InitTypeDef Config = {0};

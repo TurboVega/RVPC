@@ -52,8 +52,7 @@
 
     .macro PIX_PAIR
     c.sw x15,0(x9)      // clear a pixel
-//    c.sw x15,0(x8)      // set a pixel
-    c.sw x15,0(x9)      // clear a pixel
+    c.sw x15,0(x8)      // set a pixel
     .endm
 
     .macro WRITE_VIDEO_8
