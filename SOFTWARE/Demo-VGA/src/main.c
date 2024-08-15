@@ -188,18 +188,38 @@ extern void waste_time0();
 extern void waste_time1();
 
 void write_scan_line(uint16_t row) {
+/*
     uint32_t col;
     register const Write8Pixels* char_defs = character_defs[row & 0x7]; // point to array of scan line functions
     register const uint8_t* char_indexes = screen_chars[row >> 3]; // point to array of character codes (text line)
+
     register uint32_t video_out = VGA_DATA_PIN;
     register uint32_t bshr = (uint32_t)(&VGA_DATA_GPIO->BSHR);
     register uint32_t bcr = (uint32_t)(&VGA_DATA_GPIO->BCR);
 
-    for (col = 0; col < 10/*NUM_COLS*/; col++) {
+    for (col = 0; col < NUM_COLS; col++) {
         uint16_t ch = (uint16_t)(*char_indexes++); // get one character code
         Write8Pixels write = char_defs[ch]; // get function ptr for writing scan line of character
         (*write)(video_out, bshr, bcr);
     }
+*/
+    // Unroll the loop for columns
+    __asm(\
+    "la      a3,character_defs  \n" // load a3(x13) with character_defs array address
+    "la      a4,screen_chars    \n" // load a4(x14) with screen_chars array address
+    "li      a1,0x40011010      \n" // load a1(x11) with BSHR address
+    "li      a2,0x40011014      \n" // load a2(x12) with BCR address
+    "addi    a0,x0,4            \n" // load a0(x10) with bit value of video-out pin
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    );
+    (*character_defs[0])(4, 0x40011010, 0x40011014);
+    //(*char_defs[(uint16_t)(char_indexes[1])])(video_out, bshr, bcr);
+    //(*char_defs[(uint16_t)(char_indexes[2])])(video_out, bshr, bcr);
 }
 
 int main(void) {

@@ -24,14 +24,14 @@
 
 //--------------------------------
 
-#define CHAR_DEF_0x00_0 __00000000
-#define CHAR_DEF_0x00_1 __00000000
-#define CHAR_DEF_0x00_2 __00000000
-#define CHAR_DEF_0x00_3 __00000000
-#define CHAR_DEF_0x00_4 __00000000
-#define CHAR_DEF_0x00_5 __00000000
-#define CHAR_DEF_0x00_6 __00000000
-#define CHAR_DEF_0x00_7 __00000000
+#define CHAR_DEF_0x00_0 __10101010
+#define CHAR_DEF_0x00_1 __01010101
+#define CHAR_DEF_0x00_2 __10101010
+#define CHAR_DEF_0x00_3 __01010101
+#define CHAR_DEF_0x00_4 __10101010
+#define CHAR_DEF_0x00_5 __01010101
+#define CHAR_DEF_0x00_6 __10101010
+#define CHAR_DEF_0x00_7 __01010101
 
 #define CHAR_DEF_0x01_0 __00000000
 #define CHAR_DEF_0x01_1 __00000000
@@ -2387,6 +2387,7 @@
 #define __00111000 drw8_0x38
 #define __00111100 drw8_0x3C
 #define __01001100 drw8_0x4C
+#define __01010101 drw8_0x55
 #define __01011010 drw8_0x5A
 #define __01100000 drw8_0x60
 #define __01100010 drw8_0x62
@@ -2407,6 +2408,7 @@
 #define __10011000 drw8_0x98
 #define __10011110 drw8_0x9E
 #define __10100110 drw8_0xA6
+#define __10101010 drw8_0xAA
 #define __10101100 drw8_0xAC
 #define __11000000 drw8_0xC0
 #define __11000110 drw8_0xC6
