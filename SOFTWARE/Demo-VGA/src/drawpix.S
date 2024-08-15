@@ -9,8 +9,8 @@
 // RA x1    return address
 // SP x2    stack pointer
 // a0 x10   video-out bit value in GPIO (0x00000004)
-// s0 x8    address of GPIO BSHR (0x40011010)
-// s1 x9    address of GPIO BCR (0x40011014)
+// a1 x11   address of GPIO BSHR (0x40011010)
+// a2 x12   address of GPIO BCR (0x40011014)
 
 //-----------------------------------------------------------
 
@@ -277,11 +277,11 @@
     .global   drw8_0xFF
 
     .macro USE_BSHR
-    c.sw x10,0(x8)      // store video-out bit into GPIO BSHR */
+    c.sw a0,0(a1)     // store video-out bit into GPIO BSHR */
     .endm
 
     .macro USE_BCR
-    c.sw x10,0(x9)      // store video-out bit into GPIO BCR */
+    c.sw a0,0(a2)     // store video-out bit into GPIO BCR */
     .endm
 
     .macro PX00

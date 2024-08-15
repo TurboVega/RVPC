@@ -2708,6 +2708,8 @@
         CHAR_LINE(n, 0xFF) \
     }
 
+typedef void (*Write8Pixels)(uint32_t video_out, uint32_t bshr, uint32_t bcr);
+
 #if DEF_SCREEN_ARRAYS
 
 extern void drw8_0x00();
@@ -2967,8 +2969,6 @@ extern void drw8_0xFD();
 extern void drw8_0xFE();
 extern void drw8_0xFF();
 
-typedef void (*Write8Pixels)();
-
 // These are the character definitions in ROM (flash memory).
 //
 const Write8Pixels character_defs[8][256] = {
@@ -2988,7 +2988,7 @@ uint8_t screen_chars[NUM_ROWS][NUM_COLS];
 
 #else
 
-extern const uint16_t character_defs[8][256];//[9];
+extern const Write8Pixels character_defs[8][256];
 extern uint8_t screen_chars[NUM_ROWS][NUM_COLS];
 
 #endif // DEF_SCREEN_ARRAYS

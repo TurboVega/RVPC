@@ -171,15 +171,6 @@ void PWM_Config(TIM_TypeDef *TIM, uint8_t channel, uint16_t pulse, uint16_t mode
 	#define VGA_VFRONT_PORCH    1
 #endif
 
-// -- about to rework assembler stuff --
-// a0 x10   ((USE_BCR  << 0) | (USE_BCR  << 16))  pixels __ (0xC09CC09C)
-// a1 x11   ((USE_BCR  << 0) | (USE_BSHR << 16))  pixels _* (0xC01CC09C)
-// a2 x12   ((USE_BSHR << 0) | (USE_BCR  << 16))  pixels *_ (0xC09CC01C)
-// a3 x13   ((USE_BSHR << 0) | (USE_BSHR << 16))  pixels ** (0xC01CC01C)
-// a4 x14   address of dynamic code for 1 glyph scan line (8 pixels)
-
-typedef void (*SetCodePiece)(uint32_t code0, uint32_t code1, uint32_t code2, uint32_t code3, uint32_t dyn_code);
-
 void init_screen() {
     uint8_t ch = 0;
     for (uint8_t row = 0; row < NUM_ROWS; row++) {
@@ -190,23 +181,21 @@ void init_screen() {
 }
 
 extern void draw_pixels();
-extern void run_dynamic_code();
-extern void write_pixels();
 extern void waste_time0();
 extern void waste_time1();
 
-void prepare_scan_line(uint16_t row) {
+void write_scan_line(uint16_t row) {
     uint32_t col;
-    register const uint16_t* char_defs = (const uint16_t*) character_defs[row & 0x7]; // point to array of scan line functions
+    register const Write8Pixels* char_defs = character_defs[row & 0x7]; // point to array of scan line functions
     register const uint8_t* char_indexes = screen_chars[row >> 3]; // point to array of character codes (text line)
-    register uint32_t dyn_code = ((uint32_t) write_pixels); // point to 8 HW instructions per char column
+    register uint32_t video_out = VGA_DATA_PIN;
+    register uint32_t bshr = (uint32_t)(&VGA_DATA_GPIO->BSHR);
+    register uint32_t bcr = (uint32_t)(&VGA_DATA_GPIO->BCR);
 
     for (col = 0; col < 16/*NUM_COLS*/; col++) {
         uint16_t ch = (uint16_t)(*char_indexes++); // get one character code
-        uint16_t def = (uint16_t)(char_defs[ch]); // get scan line bits for character
-        SetCodePiece set_code = (SetCodePiece)(((uint32_t)draw_pixels) + (def * 10)); // 5 HW instructions per column
-        (*set_code)(0xC09CC09C, 0xC01CC09C, 0xC09CC01C, 0xC01CC01C, dyn_code);
-        dyn_code += 16; // 8 HW instructions per char column
+        Write8Pixels write = char_defs[ch]; // get function ptr for writing scan line of character
+        (*write)(video_out, bshr, bcr);
     }
 }
 
@@ -285,14 +274,7 @@ void TIM2_IRQHandler(void) {
 	}
 
     waste_time0();
-    run_dynamic_code();
-
-    uint16_t row = ((uint16_t)(current_row - (VGA_VBACK_PORCH+1))) >> 1;
-    if (row < VGA_VACTIVE_LINES-1) {
-        prepare_scan_line(row);
-    } else {
-        prepare_scan_line(0);
-    }
+    write_scan_line(current_row);
 
 exit:
 	VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
