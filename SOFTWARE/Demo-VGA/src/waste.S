@@ -19,7 +19,7 @@ waste_time1:
 
 waste_time0:
 
-    addi    x5,x0,12            // load delay loop count
+    addi    x5,x0,22            // load delay loop count
 
 waste_loop:
 

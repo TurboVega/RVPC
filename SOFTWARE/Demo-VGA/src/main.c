@@ -203,6 +203,7 @@ void write_scan_line(uint16_t row) {
         (*write)(video_out, bshr, bcr);
     }
 */
+
     // Unroll the loop for columns
     __asm(\
     "la      a3,character_defs  \n" // load a3(x13) with character_defs array address
@@ -210,16 +211,38 @@ void write_scan_line(uint16_t row) {
     "li      a1,0x40011010      \n" // load a1(x11) with BSHR address
     "li      a2,0x40011014      \n" // load a2(x12) with BCR address
     "addi    a0,x0,4            \n" // load a0(x10) with bit value of video-out pin
+    "lw      a3,0(a3)           \n" // load address of drawing function
+    "c.mv    x5,x1              \n" // save return address
     "jalr    a3                 \n" // write scan line of char in column 0
     "jalr    a3                 \n" // write scan line of char in column 0
     "jalr    a3                 \n" // write scan line of char in column 0
     "jalr    a3                 \n" // write scan line of char in column 0
     "jalr    a3                 \n" // write scan line of char in column 0
     "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "jalr    a3                 \n" // write scan line of char in column 0
+    "c.mv    x1,x5              \n" // restore return address
     );
-    (*character_defs[0])(4, 0x40011010, 0x40011014);
+
+    //(*(character_defs[0][0]))(4, 0x40011010, 0x40011014);
     //(*char_defs[(uint16_t)(char_indexes[1])])(video_out, bshr, bcr);
     //(*char_defs[(uint16_t)(char_indexes[2])])(video_out, bshr, bcr);
+
+    //for (int x = 0; x < 20; x++) VGA_DATA_GPIO->BSHR = VGA_DATA_PIN;
 }
 
 int main(void) {
