@@ -209,7 +209,7 @@ extern void waste_time1();
 
 
 void write_scan_line(uint16_t row) {
-    // Unroll the loop for columns
+    // Unroll the loop for columns and draw glyph bits
     __asm(\
     "la     a2,glyph_bits     \n" // load a2(x12) with glyph_bits array address
     "li     a1,0x40011010      \n" // load a1(x11) with BSHR address
@@ -235,9 +235,10 @@ void write_scan_line(uint16_t row) {
     WRITE_GLYPH_LINE(76)
     WRITE_GLYPH_LINE(80)
     );
+}
 
+void prepare_scan_line(uint16_t row) {
     // Prepare the next text scan line (all columns)
-    row += 1;
     register const uint32_t* char_defs = character_defs[row & 0x7]; // point to fixed array of scan line words
     register uint8_t* char_indexes = screen_chars[row >> 3]; // point to array of character codes (text line)
     register uint32_t* glyph_lines = glyph_bits; // point to array of glyph bits data for drawing
@@ -345,15 +346,21 @@ void TIM1_IRQHandler(void) {
 void TIM2_IRQHandler(void)   __attribute__((interrupt("WCH-Interrupt-fast")));
 void TIM2_IRQHandler(void) {
 
-#define VADJUST 32
+#define VADJUST (VGA_VBACK_PORCH+4)
 
-	uint32_t current_row = VGA_VSYNC_TIM->CNT;
-	if (current_row < VGA_VBACK_PORCH+VADJUST || current_row >= VGA_VBACK_PORCH+VADJUST+(32*NUM_ROWS)) {
+	uint32_t current_row = VGA_VSYNC_TIM->CNT - VADJUST;
+	if (current_row >= (32*NUM_ROWS)) {
 		goto exit;
 	}
 
     waste_time0();
-    write_scan_line((current_row-VGA_VBACK_PORCH-VADJUST) >> 2);
+    current_row >>= 2;
+    write_scan_line(current_row);
+    if (current_row < (VGA_VACTIVE_LINES >> 2) - 1) {
+        prepare_scan_line(current_row + 1);
+    } else {
+        prepare_scan_line(0);
+    }
 
 exit:
 	VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
