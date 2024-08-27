@@ -183,9 +183,27 @@ void init_screen() {
     }
 }
 
-extern void draw_pixels();
 extern void waste_time0();
 extern void waste_time1();
+
+#define WRITE_GLYPH_LINE(offset) \
+    "c.lw   a3," #offset "(a2) \n"    /* load glyph scan line bits for column N */ \
+    "c.sw   a3,0(a1) \n"    /* write to video-out pin */ \
+    "c.srli a3,1 \n"        /* shift next bit into pin position */ \
+    "c.sw   a3,0(a1) \n"    \
+    "c.srli a3,1 \n"        \
+    "c.sw   a3,0(a1) \n"    \
+    "c.srli a3,1 \n"        \
+    "c.sw   a3,0(a1) \n"    \
+    "c.srli a3,1 \n"        \
+    "c.sw   a3,0(a1) \n"    \
+    "c.srli a3,1 \n"        \
+    "c.sw   a3,0(a1) \n"    \
+    "c.srli a3,1 \n"        \
+    "c.sw   a3,0(a1) \n"    \
+    "c.srli a3,1 \n"        \
+    "c.sw   a3,0(a1) \n"
+
 
 void write_scan_line(uint16_t row) {
 /*
@@ -206,80 +224,30 @@ void write_scan_line(uint16_t row) {
 
     // Unroll the loop for columns
     __asm(\
-    "la      a2,character_defs  \n" // load a2(x12) with character_defs array address
-    "la      a4,screen_chars    \n" // load a4(x14) with screen_chars array address
-    "li      a1,0x40011010      \n" // load a1(x11) with BSHR address
-    "c.mv    x5,x1              \n" // save return address in t0(x5)
-
-"c.lw a3,0(a2) \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-
-"lw a3,4(a2) \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-
-"lw a3,8(a2) \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-
-"lw a3,12(a2) \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-"c.srli a3,1 \n"
-"c.sw a3,0(a1) \n"
-
-    "c.mv    x1,x5              \n" // restore return address from t0(x5)
+    "la     a2,character_defs  \n" // load a2(x12) with character_defs array address
+    "li     a1,0x40011010      \n" // load a1(x11) with BSHR address
+    WRITE_GLYPH_LINE(0)
+    WRITE_GLYPH_LINE(4)
+    WRITE_GLYPH_LINE(8)
+    WRITE_GLYPH_LINE(12)
+    WRITE_GLYPH_LINE(16)
+    WRITE_GLYPH_LINE(20)
+    WRITE_GLYPH_LINE(24)
+    WRITE_GLYPH_LINE(28)
+    WRITE_GLYPH_LINE(32)
+    WRITE_GLYPH_LINE(36)
+    WRITE_GLYPH_LINE(40)
+    WRITE_GLYPH_LINE(44)
+    WRITE_GLYPH_LINE(48)
+    WRITE_GLYPH_LINE(52)
+    WRITE_GLYPH_LINE(56)
+    WRITE_GLYPH_LINE(60)
+    WRITE_GLYPH_LINE(64)
+    WRITE_GLYPH_LINE(68)
+    WRITE_GLYPH_LINE(72)
+    WRITE_GLYPH_LINE(76)
+    WRITE_GLYPH_LINE(80)
+    WRITE_GLYPH_LINE(84)
     );
 
     //(*(character_defs[0][0]))(4, 0x40011010, 0x40011014);

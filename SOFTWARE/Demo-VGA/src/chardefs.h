@@ -17,20 +17,20 @@
 
 #include <stdint.h>
 
-#define NUM_COLS        30
-#define NUM_ROWS        37
+#define NUM_COLS        22
+#define NUM_ROWS        18
 #define CHAR_WIDTH       8
 #define CHAR_HEIGHT      8
 
 #define SPLIT_VALUE(val) \
-            ((((val>>0)&1)?(1<<18):(1<<2)) | \
-            (((val>>1)&1)?(1<<19):(1<<3)) | \
-            (((val>>2)&1)?(1<<20):(1<<4)) | \
-            (((val>>3)&1)?(1<<21):(1<<5)) | \
-            (((val>>4)&1)?(1<<22):(1<<6)) | \
-            (((val>>5)&1)?(1<<23):(1<<7)) | \
-            (((val>>6)&1)?(1<<24):(1<<8)) | \
-            (((val>>7)&1)?(1<<25):(1<<9)))
+            ((((val>>7)&1)?(1<<2):(1<<18)) | \
+            (((val>>6)&1)?(1<<3):(1<<19)) | \
+            (((val>>5)&1)?(1<<4):(1<<20)) | \
+            (((val>>4)&1)?(1<<5):(1<<21)) | \
+            (((val>>3)&1)?(1<<6):(1<<22)) | \
+            (((val>>2)&1)?(1<<7):(1<<23)) | \
+            (((val>>1)&1)?(1<<8):(1<<24)) | \
+            (((val>>0)&1)?(1<<9):(1<<25)))
 
 //--------------------------------
 
@@ -2664,12 +2664,12 @@ const uint32_t character_defs[8][256] = {
 
 // These are the screen characters in RAM (read/write memory).
 //
-uint8_t screen_chars[NUM_ROWS][NUM_COLS];
+uint32_t screen_chars[NUM_ROWS][NUM_COLS];
 
 #else
 
 extern const uint32_t character_defs[8][256];
-extern uint8_t screen_chars[NUM_ROWS][NUM_COLS];
+extern uint32_t screen_chars[NUM_ROWS][NUM_COLS];
 
 #endif // DEF_SCREEN_ARRAYS
 
