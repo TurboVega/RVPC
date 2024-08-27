@@ -345,15 +345,15 @@ void TIM1_IRQHandler(void) {
 void TIM2_IRQHandler(void)   __attribute__((interrupt("WCH-Interrupt-fast")));
 void TIM2_IRQHandler(void) {
 
-#define VADJUST 4
+#define VADJUST 32
 
 	uint32_t current_row = VGA_VSYNC_TIM->CNT;
-	if (current_row < VGA_VBACK_PORCH+VADJUST || current_row >= VGA_VBACK_PORCH+VADJUST+(16*NUM_ROWS)) {
+	if (current_row < VGA_VBACK_PORCH+VADJUST || current_row >= VGA_VBACK_PORCH+VADJUST+(32*NUM_ROWS)) {
 		goto exit;
 	}
 
     waste_time0();
-    write_scan_line((current_row-VGA_VBACK_PORCH-VADJUST) >> 1);
+    write_scan_line((current_row-VGA_VBACK_PORCH-VADJUST) >> 2);
 
 exit:
 	VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
