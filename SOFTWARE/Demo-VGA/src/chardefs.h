@@ -17,8 +17,8 @@
 
 #include <stdint.h>
 
-#define NUM_COLS        22
-#define NUM_ROWS        18
+#define NUM_COLS        21
+#define NUM_ROWS        12
 #define CHAR_WIDTH       8
 #define CHAR_HEIGHT      8
 
@@ -2664,12 +2664,14 @@ const uint32_t character_defs[8][256] = {
 
 // These are the screen characters in RAM (read/write memory).
 //
-uint32_t screen_chars[NUM_ROWS][NUM_COLS];
+uint8_t screen_chars[NUM_ROWS][NUM_COLS];
+uint32_t glyph_bits[NUM_COLS];
 
 #else
 
 extern const uint32_t character_defs[8][256];
-extern uint32_t screen_chars[NUM_ROWS][NUM_COLS];
+extern uint8_t screen_chars[NUM_ROWS][NUM_COLS];
+extern uint32_t glyph_bits[NUM_COLS];
 
 #endif // DEF_SCREEN_ARRAYS
 

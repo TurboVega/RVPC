@@ -204,27 +204,14 @@ extern void waste_time1();
     "c.srli a3,1 \n"        \
     "c.sw   a3,0(a1) \n"
 
+#define COPY_GLYPH_BITS(col) \
+    glyph_lines[col] = char_defs[char_indexes[col]];
+
 
 void write_scan_line(uint16_t row) {
-/*
-    uint32_t col;
-    register const Write8Pixels* char_defs = character_defs[row & 0x7]; // point to array of scan line functions
-    register const uint8_t* char_indexes = screen_chars[row >> 3]; // point to array of character codes (text line)
-
-    register uint32_t video_out = VGA_DATA_PIN;
-    register uint32_t bshr = (uint32_t)(&VGA_DATA_GPIO->BSHR);
-    register uint32_t bcr = (uint32_t)(&VGA_DATA_GPIO->BCR);
-
-    for (col = 0; col < NUM_COLS; col++) {
-        uint16_t ch = (uint16_t)(*char_indexes++); // get one character code
-        Write8Pixels write = char_defs[ch]; // get function ptr for writing scan line of character
-        (*write)(video_out, bshr, bcr);
-    }
-*/
-
     // Unroll the loop for columns
     __asm(\
-    "la     a2,character_defs  \n" // load a2(x12) with character_defs array address
+    "la     a2,glyph_bits     \n" // load a2(x12) with glyph_bits array address
     "li     a1,0x40011010      \n" // load a1(x11) with BSHR address
     WRITE_GLYPH_LINE(0)
     WRITE_GLYPH_LINE(4)
@@ -247,14 +234,35 @@ void write_scan_line(uint16_t row) {
     WRITE_GLYPH_LINE(72)
     WRITE_GLYPH_LINE(76)
     WRITE_GLYPH_LINE(80)
-    WRITE_GLYPH_LINE(84)
     );
 
-    //(*(character_defs[0][0]))(4, 0x40011010, 0x40011014);
-    //(*char_defs[(uint16_t)(char_indexes[1])])(video_out, bshr, bcr);
-    //(*char_defs[(uint16_t)(char_indexes[2])])(video_out, bshr, bcr);
+    // Prepare the next text scan line (all columns)
+    row += 1;
+    register const uint32_t* char_defs = character_defs[row & 0x7]; // point to fixed array of scan line words
+    register uint8_t* char_indexes = screen_chars[row >> 3]; // point to array of character codes (text line)
+    register uint32_t* glyph_lines = glyph_bits; // point to array of glyph bits data for drawing
 
-    //for (int x = 0; x < 20; x++) VGA_DATA_GPIO->BSHR = VGA_DATA_PIN;
+    COPY_GLYPH_BITS(0)
+    COPY_GLYPH_BITS(1)
+    COPY_GLYPH_BITS(2)
+    COPY_GLYPH_BITS(3)
+    COPY_GLYPH_BITS(4)
+    COPY_GLYPH_BITS(5)
+    COPY_GLYPH_BITS(6)
+    COPY_GLYPH_BITS(7)
+    COPY_GLYPH_BITS(8)
+    COPY_GLYPH_BITS(9)
+    COPY_GLYPH_BITS(10)
+    COPY_GLYPH_BITS(11)
+    COPY_GLYPH_BITS(12)
+    COPY_GLYPH_BITS(13)
+    COPY_GLYPH_BITS(14)
+    COPY_GLYPH_BITS(15)
+    COPY_GLYPH_BITS(16)
+    COPY_GLYPH_BITS(17)
+    COPY_GLYPH_BITS(18)
+    COPY_GLYPH_BITS(19)
+    COPY_GLYPH_BITS(20)
 }
 
 int main(void) {
