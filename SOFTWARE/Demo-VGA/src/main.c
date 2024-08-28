@@ -192,45 +192,6 @@ extern void waste_time1();
     "c.srli a3,1 \n"        \
     "c.sw   a3,0(a1) \n"
 
-void write_scan_line() {
-    // Unroll the loop for columns and draw glyph bits
-    __asm(\
-    "la     a2,glyph_bits     \n" // load a2(x12) with glyph_bits array address
-    "li     a1,0x40011010     \n" // load a1(x11) with BSHR address
-    "addi   sp,sp,-12         \n" // make space on stack
-    "sw     a1,0(sp)          \n" // save a1(x11)
-    "sw     a2,4(sp)          \n" // save a2(x12)
-    "sw     a3,8(sp)          \n" // save a3(x13)
-    WRITE_GLYPH_LINE(4*0)
-    WRITE_GLYPH_LINE(4*1)
-    WRITE_GLYPH_LINE(4*2)
-    WRITE_GLYPH_LINE(4*3)
-    WRITE_GLYPH_LINE(4*4)
-    WRITE_GLYPH_LINE(4*5)
-    WRITE_GLYPH_LINE(4*6)
-    WRITE_GLYPH_LINE(4*7)
-    WRITE_GLYPH_LINE(4*8)
-    WRITE_GLYPH_LINE(4*9)
-    WRITE_GLYPH_LINE(4*10)
-    WRITE_GLYPH_LINE(4*11)
-    WRITE_GLYPH_LINE(4*12)
-    WRITE_GLYPH_LINE(4*13)
-    WRITE_GLYPH_LINE(4*14)
-    WRITE_GLYPH_LINE(4*15)
-    WRITE_GLYPH_LINE(4*16)
-    WRITE_GLYPH_LINE(4*17)
-    WRITE_GLYPH_LINE(4*18)
-    WRITE_GLYPH_LINE(4*19)
-    WRITE_GLYPH_LINE(4*20)
-    "addi   a3,a0,4           \n" // Load video-out bit value
-    "c.sw   a3,4(a1)          \n" // Clear video-out pin via BCR
-    "lw     a1,0(sp)          \n" // restore a1(x11)
-    "lw     a2,4(sp)          \n" // restore a2(x12)
-    "lw     a3,8(sp)          \n" // restore a3(x13)
-    "addi   sp,sp,12          \n" // undo space on stack
-    );
-}
-
 #define COPY_GLYPH_BITS(col) \
     glyph_lines[col] = char_defs[char_indexes[col]];
 
@@ -340,6 +301,8 @@ void TIM2_IRQHandler(void)   __attribute__((interrupt("WCH-Interrupt-fast")));
 
 void TIM2_IRQHandler(void) {
 
+    VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
+
 #define VADJUST 36 // helps with vertical positioning
 
 #if TALL_CHARS_LESS_LINES
@@ -348,12 +311,16 @@ void TIM2_IRQHandler(void) {
 #define VEND    (NUM_ROWS*CHAR_HEIGHT*2)
 #endif
 
-	uint32_t scan_row = VGA_VSYNC_TIM->CNT - VADJUST;
+	uint32_t scan_row = VGA_VSYNC_TIM->CNT;
 
+    if (scan_row == 0) {
+        //prepare_scan_line(0);
+		goto exit;
+    }
+
+    scan_row -= VADJUST;
 	if (scan_row >= VEND) {
-    	VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
         if (v_state == V_STATE_FRAME_READY) {
-            //prepare_scan_line(0);
             v_state = V_STATE_BEGIN_FRAME;
         }
 		goto exit;
@@ -361,25 +328,50 @@ void TIM2_IRQHandler(void) {
 
     v_state = V_STATE_IN_FRAME;
 
-    /*if (scan_row & 1) {
+    if (scan_row & 1) {
         waste_time0();
     } else {
         waste_time1();
-    }*/
-    waste_time0();
-
+    }
 
 #if TALL_CHARS_LESS_LINES
     scan_row >>= 2;
 #elif SHORT_CHARS_MORE_LINES
     scan_row >>= 1;
 #endif
-    write_scan_line();
+
+    // Unroll the loop for columns and draw glyph bits
+    __asm(\
+    "la     a2,glyph_bits     \n" // load a2(x12) with glyph_bits array address
+    "li     a1,0x40011010     \n" // load a1(x11) with BSHR address
+    WRITE_GLYPH_LINE(4*0)
+    WRITE_GLYPH_LINE(4*1)
+    WRITE_GLYPH_LINE(4*2)
+    WRITE_GLYPH_LINE(4*3)
+    WRITE_GLYPH_LINE(4*4)
+    WRITE_GLYPH_LINE(4*5)
+    WRITE_GLYPH_LINE(4*6)
+    WRITE_GLYPH_LINE(4*7)
+    WRITE_GLYPH_LINE(4*8)
+    WRITE_GLYPH_LINE(4*9)
+    WRITE_GLYPH_LINE(4*10)
+    WRITE_GLYPH_LINE(4*11)
+    WRITE_GLYPH_LINE(4*12)
+    WRITE_GLYPH_LINE(4*13)
+    WRITE_GLYPH_LINE(4*14)
+    WRITE_GLYPH_LINE(4*15)
+    WRITE_GLYPH_LINE(4*16)
+    WRITE_GLYPH_LINE(4*17)
+    WRITE_GLYPH_LINE(4*18)
+    WRITE_GLYPH_LINE(4*19)
+    WRITE_GLYPH_LINE(4*20)
+    "addi   a3,a0,4           \n" // Load video-out bit value
+    "c.sw   a3,4(a1)          \n" // Clear video-out pin via BCR
+    );
 
     if (scan_row < VEND - 1) {
-        prepare_scan_line(scan_row + 1);
+        prepare_scan_line(scan_row);
     } else {
-        prepare_scan_line(0);
         v_state = V_STATE_END_FRAME;
     }
 
