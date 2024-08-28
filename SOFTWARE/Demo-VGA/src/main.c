@@ -348,7 +348,13 @@ void TIM2_IRQHandler(void) {
 	}
 
     v_state = V_STATE_IN_FRAME;
-    waste_time0();
+
+    if (scan_row & 1) {
+        waste_time0();
+    } else {
+        waste_time1();
+    }
+
 #if TALL_CHARS_LESS_LINES
     scan_row >>= 2;
 #elif SHORT_CHARS_MORE_LINES
