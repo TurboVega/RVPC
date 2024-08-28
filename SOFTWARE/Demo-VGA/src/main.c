@@ -346,20 +346,36 @@ void TIM1_IRQHandler(void) {
 void TIM2_IRQHandler(void)   __attribute__((interrupt("WCH-Interrupt-fast")));
 void TIM2_IRQHandler(void) {
 
-#define VADJUST (VGA_VBACK_PORCH+4)
+#define VADJUST (VGA_VBACK_PORCH)
 
-	uint32_t current_row = VGA_VSYNC_TIM->CNT - VADJUST;
-	if (current_row >= (32*NUM_ROWS)) {
+#if TALL_CHARS_LESS_LINES
+#define VEND    (NUM_ROWS*CHAR_HEIGHT*4)
+#elif SHORT_CHARS_MORE_LINES
+#define VEND    (NUM_ROWS*CHAR_HEIGHT*2)
+#endif
+
+	uint32_t scan_row = VGA_VSYNC_TIM->CNT - VADJUST;
+	if (scan_row >= VEND) {
+        if (v_state == V_STATE_FRAME_READY) {
+            prepare_scan_line(0);
+            v_state = V_STATE_BEGIN_FRAME;
+        }
 		goto exit;
 	}
 
+    v_state = V_STATE_IN_FRAME;
     waste_time0();
-    current_row >>= 2;
-    write_scan_line(current_row);
-    if (current_row < (VGA_VACTIVE_LINES >> 2) - 1) {
-        prepare_scan_line(current_row + 1);
+#if TALL_CHARS_LESS_LINES
+    scan_row >>= 2;
+#elif SHORT_CHARS_MORE_LINES
+    scan_row >>= 1;
+#endif
+    write_scan_line(scan_row);
+
+    if (scan_row < VEND - 1) {
+        prepare_scan_line(scan_row + 1);
     } else {
-        prepare_scan_line(0);
+        v_state = V_STATE_END_FRAME;
     }
 
 exit:

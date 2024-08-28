@@ -18,7 +18,12 @@
 #include <stdint.h>
 
 #define NUM_COLS        21
+#if TALL_CHARS_LESS_LINES
 #define NUM_ROWS        17
+#elif SHORT_CHARS_MORE_LINES
+#define NUM_ROWS        36
+#endif
+
 #define CHAR_WIDTH       8
 #define CHAR_HEIGHT      8
 
@@ -2647,6 +2652,11 @@
         CHAR_LINE(n, 0xFF) \
     }
 
+#define V_STATE_BEGIN_FRAME 0
+#define V_STATE_IN_FRAME    1
+#define V_STATE_END_FRAME   2
+#define V_STATE_FRAME_READY 3
+
 #if DEF_SCREEN_ARRAYS
 
 // These are the character definitions in ROM (flash memory).
@@ -2666,12 +2676,15 @@ const uint32_t character_defs[8][256] = {
 //
 uint8_t screen_chars[NUM_ROWS][NUM_COLS];
 uint32_t glyph_bits[NUM_COLS];
+volatile uint8_t v_state = V_STATE_BEGIN_FRAME;
 
 #else
 
 extern const uint32_t character_defs[8][256];
 extern uint8_t screen_chars[NUM_ROWS][NUM_COLS];
 extern uint32_t glyph_bits[NUM_COLS];
+extern volatile uint8_t v_state;
+
 
 #endif // DEF_SCREEN_ARRAYS
 
