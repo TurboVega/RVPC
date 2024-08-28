@@ -35,6 +35,7 @@
 
 #define TITLE_ROW       0
 #define PEG_TOP_ROW     4
+#define LAST_RING_ROW  13
 #define PEG_BASE_ROW   14
 #define LETTER_ROW     15
 #define STATUS_ROW     17
@@ -49,6 +50,12 @@
 #define CC_CENTER_OF_PEG_BASE   2
 #define CC_LEFT_OF_PEG_BASE     3
 #define CC_RIGHT_OF_PEG_BASE    4
+#define CC_UP_LEFT_OF_RING      5
+#define CC_UP_CENTER_OF_RING    6
+#define CC_UP_RIGHT_OF_RING     7
+#define CC_LW_LEFT_OF_RING      8
+#define CC_LW_CENTER_OF_RING    9
+#define CC_LW_RIGHT_OF_RING    10
 
 void write_at(uint8_t row, uint8_t col, char ch) {
     screen_chars[row][col] = ch;
@@ -72,6 +79,16 @@ void draw_peg(uint8_t col) {
     write_at(row, col+1, CC_RIGHT_OF_PEG_BASE);
 }
 
+void draw_ring(uint8_t row, uint8_t col, uint8_t width) {
+    uint8_t end = col + width / 2;
+    col -= width / 2;
+    write_at(row, col, CC_LEFT_OF_RING);
+    while (++col < end) {
+        write_at(row, col, CC_CENTER_OF_RING);
+    }
+    write_at(row, col, CC_RIGHT_OF_RING);
+}
+
 void initialize_application() {
     // Fill the screen with blank characters
     memset(screen_chars, 0x20, sizeof(screen_chars));
@@ -83,6 +100,9 @@ void initialize_application() {
     draw_peg(3);
     draw_peg(10);
     draw_peg(17);
+    draw_ring(LAST_RING_ROW, 3, 7);
+    draw_ring(LAST_RING_ROW-RING_HEIGHT, 3, 5);
+    draw_ring(LAST_RING_ROW-RING_HEIGHT*2, 3, 3);
 }
 
 void run_keyboard_state_machine() {
