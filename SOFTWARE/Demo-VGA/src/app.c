@@ -12,7 +12,7 @@
 //    000000000011111111112
 //    012345678901234567890
 //   +---------------------+
-// 00| ==== RVPC Demo ==== |
+// 00|===== RVPC Demo =====|
 // 01|                     |
 // 02|      /---\          |
 // 03|      \_3_/          |
@@ -34,15 +34,21 @@
 //
 
 #define TITLE_ROW       0
-#define BASE_ROW       14
+#define PEG_TOP_ROW     4
+#define PEG_BASE_ROW   14
 #define LETTER_ROW     15
 #define STATUS_ROW     17
 
 #define NUM_PEGS        3
-#define PEG_HEIGHT     10
 #define MAX_RINGS       4
 #define RING_HEIGHT     2
-#define MIN_RING_WIDTH  
+
+// Character codes:
+#define CC_TOP_OF_PEG           0
+#define CC_SHAFT_OF_PEG         1
+#define CC_CENTER_OF_PEG_BASE   2
+#define CC_LEFT_OF_PEG_BASE     3
+#define CC_RIGHT_OF_PEG_BASE    4
 
 void write_at(uint8_t row, uint8_t col, char ch) {
     screen_chars[row][col] = ch;
@@ -50,9 +56,20 @@ void write_at(uint8_t row, uint8_t col, char ch) {
 
 void print_at(uint8_t row, uint8_t col, const char* text) {
     char* ch;
-    while (ch = *text++) {
+    while ((ch = *text++)) {
         screen_chars[row][col++] = ch;
     }
+}
+
+void draw_peg(uint8_t col) {
+    uint8_t row = PEG_TOP_ROW;
+    write_at(row++, col, CC_TOP_OF_PEG);
+    while (row < PEG_BASE_ROW) {
+        write_at(row++, col, CC_SHAFT_OF_PEG);
+    }
+    write_at(row, col-1, CC_LEFT_OF_PEG_BASE);
+    write_at(row, col, CC_CENTER_OF_PEG_BASE);
+    write_at(row, col+1, CC_RIGHT_OF_PEG_BASE);
 }
 
 void initialize_application() {
@@ -60,8 +77,12 @@ void initialize_application() {
     memset(screen_chars, 0x20, sizeof(screen_chars));
 
     // Write constant texts
-    print_at(TITLE_ROW, 1, "==== RVPC Demo ====");
+    print_at(TITLE_ROW, 0, "===== RVPC Demo =====");
     print_at(STATUS_ROW, 1, "Move #  from   to");
+
+    draw_peg(3);
+    draw_peg(10);
+    draw_peg(17);
 }
 
 void run_keyboard_state_machine() {
