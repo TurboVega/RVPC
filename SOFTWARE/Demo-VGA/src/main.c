@@ -197,6 +197,10 @@ void write_scan_line() {
     __asm(\
     "la     a2,glyph_bits     \n" // load a2(x12) with glyph_bits array address
     "li     a1,0x40011010     \n" // load a1(x11) with BSHR address
+    "addi   sp,sp,-12         \n" // make space on stack
+    "sw     a1,0(sp)          \n" // save a1(x11)
+    "sw     a2,4(sp)          \n" // save a2(x12)
+    "sw     a3,8(sp)          \n" // save a3(x13)
     WRITE_GLYPH_LINE(4*0)
     WRITE_GLYPH_LINE(4*1)
     WRITE_GLYPH_LINE(4*2)
@@ -218,6 +222,12 @@ void write_scan_line() {
     WRITE_GLYPH_LINE(4*18)
     WRITE_GLYPH_LINE(4*19)
     WRITE_GLYPH_LINE(4*20)
+    "addi   a3,a0,4           \n" // Load video-out bit value
+    "c.sw   a3,4(a1)          \n" // Clear video-out pin via BCR
+    "lw     a1,0(sp)          \n" // restore a1(x11)
+    "lw     a2,4(sp)          \n" // restore a2(x12)
+    "lw     a3,8(sp)          \n" // restore a3(x13)
+    "addi   sp,sp,12          \n" // undo space on stack
     );
 }
 
@@ -339,7 +349,9 @@ void TIM2_IRQHandler(void) {
 #endif
 
 	uint32_t scan_row = VGA_VSYNC_TIM->CNT - VADJUST;
+
 	if (scan_row >= VEND) {
+    	VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
         if (v_state == V_STATE_FRAME_READY) {
             //prepare_scan_line(0);
             v_state = V_STATE_BEGIN_FRAME;
@@ -349,11 +361,13 @@ void TIM2_IRQHandler(void) {
 
     v_state = V_STATE_IN_FRAME;
 
-    if (scan_row & 1) {
+    /*if (scan_row & 1) {
         waste_time0();
     } else {
         waste_time1();
-    }
+    }*/
+    waste_time0();
+
 
 #if TALL_CHARS_LESS_LINES
     scan_row >>= 2;
@@ -365,10 +379,10 @@ void TIM2_IRQHandler(void) {
     if (scan_row < VEND - 1) {
         prepare_scan_line(scan_row + 1);
     } else {
+        prepare_scan_line(0);
         v_state = V_STATE_END_FRAME;
     }
 
 exit:
-	VGA_DATA_GPIO->BCR = VGA_DATA_PIN;
 	TIM_ClearITPendingBit(TIM2, TIM_IT_Update); 
 }
