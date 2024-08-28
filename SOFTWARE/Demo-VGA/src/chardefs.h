@@ -19,7 +19,7 @@
 
 #define NUM_COLS        21
 #if TALL_CHARS_LESS_LINES
-#define NUM_ROWS        17
+#define NUM_ROWS        18
 #elif SHORT_CHARS_MORE_LINES
 #define NUM_ROWS        36
 #endif

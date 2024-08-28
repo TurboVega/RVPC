@@ -171,18 +171,6 @@ void PWM_Config(TIM_TypeDef *TIM, uint8_t channel, uint16_t pulse, uint16_t mode
 	#define VGA_VFRONT_PORCH    1
 #endif
 
-void init_screen() {
-    uint8_t ch = 0x20;
-    for (uint8_t row = 0; row < NUM_ROWS; row++) {
-        for (uint8_t col = 0; col < NUM_COLS; col++) {
-            screen_chars[row][col] = ch++;
-            if (ch > 0x7E) {
-                ch = 0x20;
-            }
-        }
-    }
-}
-
 extern void waste_time0();
 extern void waste_time1();
 
@@ -204,38 +192,37 @@ extern void waste_time1();
     "c.srli a3,1 \n"        \
     "c.sw   a3,0(a1) \n"
 
-#define COPY_GLYPH_BITS(col) \
-    glyph_lines[col] = char_defs[char_indexes[col]];
-
-
-void write_scan_line(uint16_t row) {
+void write_scan_line() {
     // Unroll the loop for columns and draw glyph bits
     __asm(\
     "la     a2,glyph_bits     \n" // load a2(x12) with glyph_bits array address
-    "li     a1,0x40011010      \n" // load a1(x11) with BSHR address
-    WRITE_GLYPH_LINE(0)
-    WRITE_GLYPH_LINE(4)
-    WRITE_GLYPH_LINE(8)
-    WRITE_GLYPH_LINE(12)
-    WRITE_GLYPH_LINE(16)
-    WRITE_GLYPH_LINE(20)
-    WRITE_GLYPH_LINE(24)
-    WRITE_GLYPH_LINE(28)
-    WRITE_GLYPH_LINE(32)
-    WRITE_GLYPH_LINE(36)
-    WRITE_GLYPH_LINE(40)
-    WRITE_GLYPH_LINE(44)
-    WRITE_GLYPH_LINE(48)
-    WRITE_GLYPH_LINE(52)
-    WRITE_GLYPH_LINE(56)
-    WRITE_GLYPH_LINE(60)
-    WRITE_GLYPH_LINE(64)
-    WRITE_GLYPH_LINE(68)
-    WRITE_GLYPH_LINE(72)
-    WRITE_GLYPH_LINE(76)
-    WRITE_GLYPH_LINE(80)
+    "li     a1,0x40011010     \n" // load a1(x11) with BSHR address
+    WRITE_GLYPH_LINE(4*0)
+    WRITE_GLYPH_LINE(4*1)
+    WRITE_GLYPH_LINE(4*2)
+    WRITE_GLYPH_LINE(4*3)
+    WRITE_GLYPH_LINE(4*4)
+    WRITE_GLYPH_LINE(4*5)
+    WRITE_GLYPH_LINE(4*6)
+    WRITE_GLYPH_LINE(4*7)
+    WRITE_GLYPH_LINE(4*8)
+    WRITE_GLYPH_LINE(4*9)
+    WRITE_GLYPH_LINE(4*10)
+    WRITE_GLYPH_LINE(4*11)
+    WRITE_GLYPH_LINE(4*12)
+    WRITE_GLYPH_LINE(4*13)
+    WRITE_GLYPH_LINE(4*14)
+    WRITE_GLYPH_LINE(4*15)
+    WRITE_GLYPH_LINE(4*16)
+    WRITE_GLYPH_LINE(4*17)
+    WRITE_GLYPH_LINE(4*18)
+    WRITE_GLYPH_LINE(4*19)
+    WRITE_GLYPH_LINE(4*20)
     );
 }
+
+#define COPY_GLYPH_BITS(col) \
+    glyph_lines[col] = char_defs[char_indexes[col]];
 
 void prepare_scan_line(uint16_t row) {
     // Prepare the next text scan line (all columns)
@@ -265,6 +252,10 @@ void prepare_scan_line(uint16_t row) {
     COPY_GLYPH_BITS(19)
     COPY_GLYPH_BITS(20)
 }
+
+extern void initialize_application();
+extern void run_keyboard_state_machine();
+extern void run_app_state_machine();
 
 int main(void) {
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
@@ -303,20 +294,11 @@ int main(void) {
 	TIM_Cmd(VGA_VSYNC_TIM, ENABLE);
 	TIM_Cmd(VGA_HSYNC_TIM, ENABLE);
 
-    init_screen();
+    initialize_application();
 
 	while (1) {
-        /*
-        for (uint8_t row = 0; row < NUM_ROWS; row++) {
-            for (uint8_t col = 0; col < NUM_COLS; col++) {
-                uint8_t* cursor = &screen_chars[row][col];
-                uint8_t ch = *cursor + 1;
-                if (ch > 0x7E) {
-                    ch = 0x20;
-                }
-                *cursor = ch;
-            }
-        }*/
+        run_keyboard_state_machine();
+        run_app_state_machine();
 	}
 }
 
@@ -338,15 +320,17 @@ void HardFault_Handler(void) {
 }
 
 void TIM1_IRQHandler(void)   __attribute__((interrupt("WCH-Interrupt-fast")));
+
 void TIM1_IRQHandler(void) {
 	// Vsync code here
 	TIM_ClearITPendingBit(TIM1, TIM_IT_Update); 
 }
 
 void TIM2_IRQHandler(void)   __attribute__((interrupt("WCH-Interrupt-fast")));
+
 void TIM2_IRQHandler(void) {
 
-#define VADJUST (VGA_VBACK_PORCH)
+#define VADJUST 36 // helps with vertical positioning
 
 #if TALL_CHARS_LESS_LINES
 #define VEND    (NUM_ROWS*CHAR_HEIGHT*4)
@@ -357,7 +341,7 @@ void TIM2_IRQHandler(void) {
 	uint32_t scan_row = VGA_VSYNC_TIM->CNT - VADJUST;
 	if (scan_row >= VEND) {
         if (v_state == V_STATE_FRAME_READY) {
-            prepare_scan_line(0);
+            //prepare_scan_line(0);
             v_state = V_STATE_BEGIN_FRAME;
         }
 		goto exit;
@@ -370,7 +354,7 @@ void TIM2_IRQHandler(void) {
 #elif SHORT_CHARS_MORE_LINES
     scan_row >>= 1;
 #endif
-    write_scan_line(scan_row);
+    write_scan_line();
 
     if (scan_row < VEND - 1) {
         prepare_scan_line(scan_row + 1);
