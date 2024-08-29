@@ -6,6 +6,7 @@
 
 #include "chardefs.h"
 #include <string.h>
+#include <stdbool.h>
 
 // How portions the screen might look:
 //
@@ -57,6 +58,15 @@
 #define CC_LW_CENTER_OF_RING    0x09
 #define CC_LW_RIGHT_OF_RING     0x0A
 
+#define DIR_NONE        0
+#define DIR_UP          1
+#define DIR_RIGHT       2
+#define DIR_DOWN        3
+#define DIR_LEFT        4
+
+#define SOLUTION_DELAY  180 // 3.0 seconds
+#define MOVE_DELAY      6   // 0.1 seconds
+
 typedef struct {
     uint8_t row;
     uint8_t col;
@@ -73,6 +83,13 @@ typedef struct {
     uint8_t rings[NUM_RINGS];
 } Peg;
 
+typedef struct {
+    uint8_t ring;
+    uint8_t from;
+    uint8_t to;
+    uint8_t spare;
+} Move;
+
 Ring rings[NUM_RINGS] = {
     { LAST_RING_ROW-RING_HEIGHT*3, 4, 1, 3, 5, 1 },
     { LAST_RING_ROW-RING_HEIGHT*2, 4, 2, 2, 6, 1 },
@@ -85,6 +102,12 @@ Peg pegs[NUM_PEGS] = {
     { 'B', 13, 0, { 0, 0, 0, 0 }},
     { 'C', 19, 0, { 0, 0, 0, 0 }}
 };
+
+uint8_t direction = DIR_NONE;
+uint8_t delay = SOLUTION_DELAY;
+Ring* active_ring = &rings[0];
+Move stack[12];
+uint8_t moves = 0;
 
 void write_at(uint8_t row, uint8_t col, char ch) {
     screen_chars[row][col] = ch;
@@ -121,9 +144,9 @@ void draw_ring(const Ring* ring) {
     write_at(ring->row, col, CC_LW_RIGHT_OF_RING);
 }
 
-void draw_objects() {
+void animate_frame() {
     // Fill middle section of screen with blank characters
-    memset(screen_chars[1], 0x20, NUM_COLS*(NUM_ROWS-3));
+    memset((void*)screen_chars[1], 0x20, NUM_COLS*(NUM_ROWS-3));
 
     // Draw pieces
     draw_peg(&pegs[0]);
@@ -142,16 +165,53 @@ void initialize_application() {
     // Write constant texts
     print_at(TITLE_ROW, 0, "===== RVPC Demo =====");
     print_at(STATUS_ROW, 1, "Move #  from   to");
+
+    // Prepare for first move
+    Move* move = stack;
+    move->ring = 0;
+    move->from = 0;
+    move->to = 1;
+    move->spare = 2;
 }
 
 void run_keyboard_state_machine() {
-
 }
 
 void run_app_state_machine() {
+    bool redraw;
     if (v_state == V_STATE_END_FRAME) {
-        // Draw the next frame (array of character codes).
-        draw_objects();
+        if (delay) {
+            delay--;
+        } else {
+             redraw = true;
+
+            switch (direction) {
+                case DIR_NONE: {
+
+                } break;
+
+                case DIR_UP: {
+
+                } break;
+
+                case DIR_RIGHT: {
+
+                } break;
+
+                case DIR_DOWN: {
+
+                } break;
+
+                case DIR_LEFT: {
+
+                } break;
+            }
+
+            if (redraw) {
+                // Draw the next animation frame (modify array of character codes).
+                animate_frame();
+            }
+        }
         v_state = V_STATE_FRAME_READY;
     }
 }
