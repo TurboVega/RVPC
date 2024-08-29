@@ -101,14 +101,14 @@ Ring rings[NUM_RINGS] = {
 };
 
 Peg pegs[NUM_PEGS] = {
-    { 'A', 4, NUM_RINGS, { 0, 1, 2, 3 }},
+    { 'A', 4, NUM_RINGS, { 3, 2, 1, 0 }},
     { 'B', 13, 0, { 0, 0, 0, 0 }},
     { 'C', 19, 0, { 0, 0, 0, 0 }}
 };
 
 uint8_t direction = DIR_NONE;
 uint8_t delay = SOLUTION_DELAY;
-Ring* active_ring = &rings[0];
+Ring* active_ring = NULL;
 Move stack[12];
 uint8_t moves;
 uint8_t dest_row;
@@ -173,11 +173,16 @@ uint8_t get_peg_footprint(const Peg* peg, uint8_t width) {
     return width;
 }
 
-void start_move(uint8_t count, uint8_t first, uint8_t from, uint8_t to, uint8_t spare) {
+void start_move(uint8_t count, uint8_t from, uint8_t to, uint8_t spare) {
+    // Determine which ring to move.
+    Peg* peg = &pegs[from];
+    uint8_t ring_index = peg->rings[peg->count - 1];
+    Ring* ring = &rings[ring_index];
+
     // Push a move onto the stack.
     Move* move = &stack[moves++];
     move->count = count;
-    move->ring = first;
+    move->ring = ring_index;
     move->from = from;
     move->to = to;
     move->spare = spare;
@@ -185,19 +190,18 @@ void start_move(uint8_t count, uint8_t first, uint8_t from, uint8_t to, uint8_t 
     // Because of limited screen columns, bottom-most
     // ring widths and currently moving ring width determine
     // required widths of pegs, and positions of all pegs.
-    Peg* peg = &pegs[from];
-    Ring* ring = &rings[peg->rings[peg->count - 1]];
     uint8_t width0 = get_peg_footprint(&pegs[0], (to == 0 ? ring->width : PEG_BASE_WIDTH));
     uint8_t width1 = get_peg_footprint(&pegs[1], (to == 1 ? ring->width : PEG_BASE_WIDTH));
     uint8_t width2 = get_peg_footprint(&pegs[2], (to == 2 ? ring->width : PEG_BASE_WIDTH));
 
     pegs[0].col = width0 / 2;
     pegs[1].col = width0 + width1 / 2;
-    pegs[2].col = NUM_COLS - width2 / 2;
+    pegs[2].col = NUM_COLS - 1 - width2 / 2;
 
     // Start the move.
     delay = MOVE_DELAY;
     direction = DIR_UP;
+    active_ring = ring;
 }
 
 void initialize_application() {
@@ -209,7 +213,7 @@ void initialize_application() {
     print_at(STATUS_ROW, 1, "Move #  from   to");
 
     // Prepare for first move
-    start_move(NUM_RINGS, 0, 0, 1, 2);
+    start_move(NUM_RINGS, 0, 1, 2);
 }
 
 void run_keyboard_state_machine() {
@@ -228,7 +232,11 @@ void run_app_state_machine() {
                 } break;
 
                 case DIR_UP: {
-                    redraw = false;
+                    if (active_ring) {
+                        active_ring = NULL;
+                    } else {
+                        redraw = false;
+                    }
                 } break;
 
                 case DIR_RIGHT: {
