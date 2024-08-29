@@ -196,7 +196,7 @@ void start_move(uint8_t count, uint8_t from, uint8_t to, uint8_t spare) {
 
     pegs[0].col = width0 / 2;
     pegs[1].col = width0 + width1 / 2;
-    pegs[2].col = NUM_COLS - 1 - width2 / 2;
+    pegs[2].col = width0 + width1 + width2 / 2;
 
     // Start the move.
     delay = MOVE_DELAY;
