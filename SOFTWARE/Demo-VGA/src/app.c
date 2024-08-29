@@ -41,28 +41,44 @@
 #define STATUS_ROW     17
 
 #define NUM_PEGS        3
-#define MAX_RINGS       4
+#define NUM_RINGS       4
 #define RING_HEIGHT     2
 
 // Character codes:
-#define CC_TOP_OF_PEG           0
-#define CC_SHAFT_OF_PEG         1
-#define CC_CENTER_OF_PEG_BASE   2
-#define CC_LEFT_OF_PEG_BASE     3
-#define CC_RIGHT_OF_PEG_BASE    4
-#define CC_UP_LEFT_OF_RING      5
-#define CC_UP_CENTER_OF_RING    6
-#define CC_UP_RIGHT_OF_RING     7
-#define CC_LW_LEFT_OF_RING      8
-#define CC_LW_CENTER_OF_RING    9
-#define CC_LW_RIGHT_OF_RING    10
+#define CC_TOP_OF_PEG           0x00
+#define CC_SHAFT_OF_PEG         0x01
+#define CC_CENTER_OF_PEG_BASE   0x02
+#define CC_LEFT_OF_PEG_BASE     0x03
+#define CC_RIGHT_OF_PEG_BASE    0x04
+#define CC_UP_LEFT_OF_RING      0x05
+#define CC_UP_CENTER_OF_RING    0x06
+#define CC_UP_RIGHT_OF_RING     0x07
+#define CC_LW_LEFT_OF_RING      0x08
+#define CC_LW_CENTER_OF_RING    0x09
+#define CC_LW_RIGHT_OF_RING     0x0A
+
+typedef struct {
+    uint8_t row;
+    uint8_t col;
+    uint8_t extend;
+    uint8_t start;
+    uint8_t end;
+    uint8_t peg;
+} Ring;
+
+Ring rings[NUM_RINGS] = {
+    { LAST_RING_ROW-RING_HEIGHT*0, 4, 4, 0, 8, 1 },
+    { LAST_RING_ROW-RING_HEIGHT*1, 4, 3, 1, 7, 1 },
+    { LAST_RING_ROW-RING_HEIGHT*2, 4, 2, 2, 6, 1 },
+    { LAST_RING_ROW-RING_HEIGHT*3, 4, 1, 3, 5, 1 }
+};
 
 void write_at(uint8_t row, uint8_t col, char ch) {
     screen_chars[row][col] = ch;
 }
 
 void print_at(uint8_t row, uint8_t col, const char* text) {
-    char* ch;
+    char ch;
     while ((ch = *text++)) {
         screen_chars[row][col++] = ch;
     }
@@ -79,14 +95,16 @@ void draw_peg(uint8_t col) {
     write_at(row, col+1, CC_RIGHT_OF_PEG_BASE);
 }
 
-void draw_ring(uint8_t row, uint8_t col, uint8_t width) {
-    uint8_t end = col + width / 2;
-    col -= width / 2;
-    write_at(row, col, CC_LEFT_OF_RING);
-    while (++col < end) {
-        write_at(row, col, CC_CENTER_OF_RING);
+void draw_ring(const Ring* ring) {
+    write_at(ring->row-1, ring->start, CC_UP_LEFT_OF_RING);
+    write_at(ring->row, ring->start, CC_LW_LEFT_OF_RING);
+    uint8_t col = ring->start;
+    while (++col < ring->end) {
+        write_at(ring->row-1, col, CC_UP_CENTER_OF_RING);
+        write_at(ring->row, col, CC_LW_CENTER_OF_RING);
     }
-    write_at(row, col, CC_RIGHT_OF_RING);
+    write_at(ring->row-1, col, CC_UP_RIGHT_OF_RING);
+    write_at(ring->row, col, CC_LW_RIGHT_OF_RING);
 }
 
 void initialize_application() {
@@ -97,12 +115,13 @@ void initialize_application() {
     print_at(TITLE_ROW, 0, "===== RVPC Demo =====");
     print_at(STATUS_ROW, 1, "Move #  from   to");
 
-    draw_peg(3);
-    draw_peg(10);
+    draw_peg(4);
+    draw_peg(13);
     draw_peg(17);
-    draw_ring(LAST_RING_ROW, 3, 7);
-    draw_ring(LAST_RING_ROW-RING_HEIGHT, 3, 5);
-    draw_ring(LAST_RING_ROW-RING_HEIGHT*2, 3, 3);
+    draw_ring(&rings[0]); // 1+7+1 wide
+    draw_ring(&rings[1]); // 1+5+1 wide
+    draw_ring(&rings[2]); // 1+3+1 wide
+    draw_ring(&rings[3]); // 1+1+1 wide
 }
 
 void run_keyboard_state_machine() {
