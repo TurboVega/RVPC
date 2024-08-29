@@ -121,14 +121,11 @@ void draw_ring(const Ring* ring) {
     write_at(ring->row, col, CC_LW_RIGHT_OF_RING);
 }
 
-void initialize_application() {
-    // Fill the screen with blank characters
-    memset(screen_chars, 0x20, sizeof(screen_chars));
+void draw_objects() {
+    // Fill middle section of screen with blank characters
+    memset(screen_chars[1], 0x20, NUM_COLS*(NUM_ROWS-3));
 
-    // Write constant texts
-    print_at(TITLE_ROW, 0, "===== RVPC Demo =====");
-    print_at(STATUS_ROW, 1, "Move #  from   to");
-
+    // Draw pieces
     draw_peg(&pegs[0]);
     draw_peg(&pegs[1]);
     draw_peg(&pegs[2]);
@@ -138,6 +135,15 @@ void initialize_application() {
     draw_ring(&rings[3]); // 1+1+1 wide
 }
 
+void initialize_application() {
+    // Fill entire screen with blank characters
+    memset(screen_chars, 0x20, sizeof(screen_chars));
+
+    // Write constant texts
+    print_at(TITLE_ROW, 0, "===== RVPC Demo =====");
+    print_at(STATUS_ROW, 1, "Move #  from   to");
+}
+
 void run_keyboard_state_machine() {
 
 }
@@ -145,6 +151,7 @@ void run_keyboard_state_machine() {
 void run_app_state_machine() {
     if (v_state == V_STATE_END_FRAME) {
         // Draw the next frame (array of character codes).
+        draw_objects();
         v_state = V_STATE_FRAME_READY;
     }
 }

@@ -2656,6 +2656,7 @@
 #define V_STATE_IN_FRAME    1
 #define V_STATE_END_FRAME   2
 #define V_STATE_FRAME_READY 3
+#define V_STATE_PREPARED    4
 
 #if DEF_SCREEN_ARRAYS
 

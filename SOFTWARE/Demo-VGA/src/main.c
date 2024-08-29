@@ -306,27 +306,32 @@ void TIM2_IRQHandler(void) {
 #define VADJUST 36 // helps with vertical positioning
 
 #if TALL_CHARS_LESS_LINES
-#define VEND    (NUM_ROWS*CHAR_HEIGHT*4)
+#define VHEIGHT (NUM_ROWS*CHAR_HEIGHT)
+#define VEND    (VHEIGHT*4)
 #elif SHORT_CHARS_MORE_LINES
-#define VEND    (NUM_ROWS*CHAR_HEIGHT*2)
+#define VEND    (VHEIGHT*2)
 #endif
 
 	uint32_t scan_row = VGA_VSYNC_TIM->CNT;
 
-    if (scan_row == 0) {
-        //prepare_scan_line(0);
-		goto exit;
+    if (scan_row < VADJUST) {
+        v_state = V_STATE_BEGIN_FRAME;
+		goto done;
+    } else if (scan_row == VADJUST) {
+        v_state = V_STATE_IN_FRAME;
+    } else if (v_state == V_STATE_FRAME_READY) {
+        prepare_scan_line(0);
+        v_state = V_STATE_PREPARED;
+        goto done;
+    } else if (v_state >= V_STATE_END_FRAME) {
+        goto done;
     }
 
     scan_row -= VADJUST;
 	if (scan_row >= VEND) {
-        if (v_state == V_STATE_FRAME_READY) {
-            v_state = V_STATE_BEGIN_FRAME;
-        }
-		goto exit;
+        v_state = V_STATE_END_FRAME;
+		goto done;
 	}
-
-    v_state = V_STATE_IN_FRAME;
 
     if (scan_row & 1) {
         waste_time0();
@@ -369,12 +374,12 @@ void TIM2_IRQHandler(void) {
     "c.sw   a3,4(a1)          \n" // Clear video-out pin via BCR
     );
 
-    if (scan_row < VEND - 1) {
+    if (scan_row < VHEIGHT - 1) {
         prepare_scan_line(scan_row);
     } else {
         v_state = V_STATE_END_FRAME;
     }
 
-exit:
+done:
 	TIM_ClearITPendingBit(TIM2, TIM_IT_Update); 
 }
