@@ -44,6 +44,7 @@
 #define NUM_PEGS        3
 #define NUM_RINGS       4
 #define RING_HEIGHT     2
+#define PEG_BASE_WIDTH  3
 
 // Character codes:
 #define CC_TOP_OF_PEG           0x00
@@ -73,6 +74,7 @@ typedef struct {
     uint8_t extend;
     uint8_t start;
     uint8_t end;
+    uint8_t width;
     uint8_t peg;
 } Ring;
 
@@ -84,6 +86,7 @@ typedef struct {
 } Peg;
 
 typedef struct {
+    uint8_t count;
     uint8_t ring;
     uint8_t from;
     uint8_t to;
@@ -91,10 +94,10 @@ typedef struct {
 } Move;
 
 Ring rings[NUM_RINGS] = {
-    { LAST_RING_ROW-RING_HEIGHT*3, 4, 1, 3, 5, 1 },
-    { LAST_RING_ROW-RING_HEIGHT*2, 4, 2, 2, 6, 1 },
-    { LAST_RING_ROW-RING_HEIGHT*1, 4, 3, 1, 7, 1 },
-    { LAST_RING_ROW-RING_HEIGHT*0, 4, 4, 0, 8, 1 }
+    { LAST_RING_ROW-RING_HEIGHT*3, 4, 1, 3, 5, 3, 1 },
+    { LAST_RING_ROW-RING_HEIGHT*2, 4, 2, 2, 6, 5, 1 },
+    { LAST_RING_ROW-RING_HEIGHT*1, 4, 3, 1, 7, 7, 1 },
+    { LAST_RING_ROW-RING_HEIGHT*0, 4, 4, 0, 8, 9, 1 }
 };
 
 Peg pegs[NUM_PEGS] = {
@@ -107,7 +110,9 @@ uint8_t direction = DIR_NONE;
 uint8_t delay = SOLUTION_DELAY;
 Ring* active_ring = &rings[0];
 Move stack[12];
-uint8_t moves = 0;
+uint8_t moves;
+uint8_t dest_row;
+uint8_t dest_col;
 
 void write_at(uint8_t row, uint8_t col, char ch) {
     screen_chars[row][col] = ch;
@@ -158,6 +163,43 @@ void animate_frame() {
     draw_ring(&rings[3]); // 1+1+1 wide
 }
 
+uint8_t get_peg_footprint(const Peg* peg, uint8_t width) {
+    if (peg->count) {
+        Ring* ring = &rings[peg->rings[0]];
+        if (ring->width > width) {
+            width = ring->width;
+        }
+    }
+    return width;
+}
+
+void start_move(uint8_t count, uint8_t first, uint8_t from, uint8_t to, uint8_t spare) {
+    // Push a move onto the stack.
+    Move* move = &stack[moves++];
+    move->count = count;
+    move->ring = first;
+    move->from = from;
+    move->to = to;
+    move->spare = spare;
+
+    // Because of limited screen columns, bottom-most
+    // ring widths and currently moving ring width determine
+    // required widths of pegs, and positions of all pegs.
+    Peg* peg = &pegs[from];
+    Ring* ring = &rings[peg->rings[peg->count - 1]];
+    uint8_t width0 = get_peg_footprint(&pegs[0], (to == 0 ? ring->width : PEG_BASE_WIDTH));
+    uint8_t width1 = get_peg_footprint(&pegs[1], (to == 1 ? ring->width : PEG_BASE_WIDTH));
+    uint8_t width2 = get_peg_footprint(&pegs[2], (to == 2 ? ring->width : PEG_BASE_WIDTH));
+
+    pegs[0].col = width0 / 2;
+    pegs[1].col = width0 + width1 / 2;
+    pegs[2].col = NUM_COLS - width2 / 2;
+
+    // Start the move.
+    delay = MOVE_DELAY;
+    direction = DIR_UP;
+}
+
 void initialize_application() {
     // Fill entire screen with blank characters
     memset(screen_chars, 0x20, sizeof(screen_chars));
@@ -167,11 +209,7 @@ void initialize_application() {
     print_at(STATUS_ROW, 1, "Move #  from   to");
 
     // Prepare for first move
-    Move* move = stack;
-    move->ring = 0;
-    move->from = 0;
-    move->to = 1;
-    move->spare = 2;
+    start_move(NUM_RINGS, 0, 0, 1, 2);
 }
 
 void run_keyboard_state_machine() {
@@ -187,11 +225,10 @@ void run_app_state_machine() {
 
             switch (direction) {
                 case DIR_NONE: {
-
                 } break;
 
                 case DIR_UP: {
-
+                    redraw = false;
                 } break;
 
                 case DIR_RIGHT: {
