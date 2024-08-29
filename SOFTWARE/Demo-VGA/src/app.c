@@ -66,11 +66,24 @@ typedef struct {
     uint8_t peg;
 } Ring;
 
+typedef struct {
+    uint8_t name;
+    uint8_t col;
+    uint8_t count;
+    uint8_t rings[NUM_RINGS];
+} Peg;
+
 Ring rings[NUM_RINGS] = {
-    { LAST_RING_ROW-RING_HEIGHT*0, 4, 4, 0, 8, 1 },
-    { LAST_RING_ROW-RING_HEIGHT*1, 4, 3, 1, 7, 1 },
+    { LAST_RING_ROW-RING_HEIGHT*3, 4, 1, 3, 5, 1 },
     { LAST_RING_ROW-RING_HEIGHT*2, 4, 2, 2, 6, 1 },
-    { LAST_RING_ROW-RING_HEIGHT*3, 4, 1, 3, 5, 1 }
+    { LAST_RING_ROW-RING_HEIGHT*1, 4, 3, 1, 7, 1 },
+    { LAST_RING_ROW-RING_HEIGHT*0, 4, 4, 0, 8, 1 }
+};
+
+Peg pegs[NUM_PEGS] = {
+    { 'A', 4, NUM_RINGS, { 0, 1, 2, 3 }},
+    { 'B', 13, 0, { 0, 0, 0, 0 }},
+    { 'C', 19, 0, { 0, 0, 0, 0 }}
 };
 
 void write_at(uint8_t row, uint8_t col, char ch) {
@@ -84,15 +97,16 @@ void print_at(uint8_t row, uint8_t col, const char* text) {
     }
 }
 
-void draw_peg(uint8_t col) {
+void draw_peg(const Peg* peg) {
     uint8_t row = PEG_TOP_ROW;
-    write_at(row++, col, CC_TOP_OF_PEG);
+    write_at(row++, peg->col, CC_TOP_OF_PEG);
     while (row < PEG_BASE_ROW) {
-        write_at(row++, col, CC_SHAFT_OF_PEG);
+        write_at(row++, peg->col, CC_SHAFT_OF_PEG);
     }
-    write_at(row, col-1, CC_LEFT_OF_PEG_BASE);
-    write_at(row, col, CC_CENTER_OF_PEG_BASE);
-    write_at(row, col+1, CC_RIGHT_OF_PEG_BASE);
+    write_at(row, peg->col-1, CC_LEFT_OF_PEG_BASE);
+    write_at(row, peg->col, CC_CENTER_OF_PEG_BASE);
+    write_at(row, peg->col+1, CC_RIGHT_OF_PEG_BASE);
+    write_at(row+1, peg->col, peg->name);
 }
 
 void draw_ring(const Ring* ring) {
@@ -115,9 +129,9 @@ void initialize_application() {
     print_at(TITLE_ROW, 0, "===== RVPC Demo =====");
     print_at(STATUS_ROW, 1, "Move #  from   to");
 
-    draw_peg(4);
-    draw_peg(13);
-    draw_peg(17);
+    draw_peg(&pegs[0]);
+    draw_peg(&pegs[1]);
+    draw_peg(&pegs[2]);
     draw_ring(&rings[0]); // 1+7+1 wide
     draw_ring(&rings[1]); // 1+5+1 wide
     draw_ring(&rings[2]); // 1+3+1 wide
