@@ -323,7 +323,7 @@ void TIM2_IRQHandler(void) {
 		goto done;
     } else if (scan_row == VADJUST) {
         v_state = V_STATE_IN_FRAME;
-    } else if (v_state == V_STATE_END_FRAME) {
+    } else if (v_state >= V_STATE_END_FRAME) {
         goto done;
     }
 
@@ -375,9 +375,9 @@ void TIM2_IRQHandler(void) {
     );
 
     if (scan_row < VHEIGHT - 1) {
-        prepare_scan_line(scan_row);
+        prepare_scan_line(scan_row + 1);
     } else {
-        v_state = V_STATE_END_FRAME;
+        //v_state = V_STATE_END_FRAME;
     }
 
 done:

@@ -66,9 +66,9 @@
 #define DIR_DOWN        3
 #define DIR_LEFT        4
 
-#define STARTUP_DELAY   300 // 5.0
-#define SOLUTION_DELAY  180 // 3.0 seconds
-#define MOVE_DELAY      6   // 0.1 seconds
+#define STARTUP_DELAY   (60*5)   // 5 seconds
+#define SOLUTION_DELAY  (60*3)   // 3 seconds
+#define MOVE_DELAY      (60/10)  // 1/10 second
 
 typedef struct {
     uint8_t row;
@@ -201,9 +201,10 @@ void start_move(uint8_t count, uint8_t from, uint8_t to, uint8_t spare) {
     pegs[2].col = width0 + width1 + width2 / 2;
 
     // Start the move.
-    delay = MOVE_DELAY;
+    delay = (count == NUM_RINGS ? STARTUP_DELAY : MOVE_DELAY);
     direction = DIR_UP;
     active_ring = ring;
+    peg = &pegs[to];
     dest_row = LAST_RING_ROW - peg->count * RING_HEIGHT;
     dest_col = peg->col;
 }
@@ -233,6 +234,7 @@ void run_app_state_machine() {
         if (delay) {
             delay--;
         } else {
+            delay = MOVE_DELAY;
             move = &stack[moves - 1];
 
             switch (direction) {
@@ -246,7 +248,6 @@ void run_app_state_machine() {
                         } else {
                             direction = DIR_LEFT;
                         }
-                        delay = MOVE_DELAY;
                     } else {
                         active_ring->row--;
                         redraw = true;
@@ -258,13 +259,19 @@ void run_app_state_machine() {
                         direction = DIR_DOWN;
                     } else {
                         active_ring->col++;
+                        active_ring->start++;
+                        active_ring->end++;
                         redraw = true;
                     }
-                    delay = MOVE_DELAY;
                 } break;
 
                 case DIR_DOWN: {
-
+                    if (active_ring->row == dest_row) {
+                        direction = DIR_NONE;
+                    } else {
+                        active_ring->row++;
+                        redraw = true;
+                    }
                 } break;
 
                 case DIR_LEFT: {
@@ -272,9 +279,10 @@ void run_app_state_machine() {
                         direction = DIR_DOWN;
                     } else {
                         active_ring->col--;
+                        active_ring->start--;
+                        active_ring->end--;
                         redraw = true;
                     }
-                    delay = MOVE_DELAY;
                 } break;
             }
         }
