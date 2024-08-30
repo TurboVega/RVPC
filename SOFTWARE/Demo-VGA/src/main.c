@@ -314,16 +314,16 @@ void TIM2_IRQHandler(void) {
 
 	uint32_t scan_row = VGA_VSYNC_TIM->CNT;
 
-    if (scan_row < VADJUST) {
+    if (v_state == V_STATE_FRAME_ACK) {
+        prepare_scan_line(0);
+        v_state = V_STATE_PREPARED;
+        goto done;
+    } else if (scan_row < VADJUST) {
         v_state = V_STATE_BEGIN_FRAME;
 		goto done;
     } else if (scan_row == VADJUST) {
         v_state = V_STATE_IN_FRAME;
-    } else if (v_state == V_STATE_FRAME_READY) {
-        prepare_scan_line(0);
-        v_state = V_STATE_PREPARED;
-        goto done;
-    } else if (v_state >= V_STATE_END_FRAME) {
+    } else if (v_state == V_STATE_END_FRAME) {
         goto done;
     }
 

@@ -36,6 +36,7 @@
 
 #define TITLE_ROW       0
 #define PEG_TOP_ROW     4
+#define FIRST_RING_ROW  2
 #define LAST_RING_ROW  13
 #define PEG_BASE_ROW   14
 #define LETTER_ROW     15
@@ -65,6 +66,7 @@
 #define DIR_DOWN        3
 #define DIR_LEFT        4
 
+#define STARTUP_DELAY   300 // 5.0
 #define SOLUTION_DELAY  180 // 3.0 seconds
 #define MOVE_DELAY      6   // 0.1 seconds
 
@@ -107,7 +109,7 @@ Peg pegs[NUM_PEGS] = {
 };
 
 uint8_t direction = DIR_NONE;
-uint8_t delay = SOLUTION_DELAY;
+uint16_t delay = STARTUP_DELAY;
 Ring* active_ring = NULL;
 Move stack[12];
 uint8_t moves;
@@ -202,6 +204,8 @@ void start_move(uint8_t count, uint8_t from, uint8_t to, uint8_t spare) {
     delay = MOVE_DELAY;
     direction = DIR_UP;
     active_ring = ring;
+    dest_row = LAST_RING_ROW - peg->count * RING_HEIGHT;
+    dest_col = peg->col;
 }
 
 void initialize_application() {
@@ -221,26 +225,42 @@ void run_keyboard_state_machine() {
 
 void run_app_state_machine() {
     bool redraw;
+    Move* move;
+
     if (v_state == V_STATE_END_FRAME) {
+        redraw = false;
+
         if (delay) {
             delay--;
         } else {
-             redraw = true;
+            move = &stack[moves - 1];
 
             switch (direction) {
                 case DIR_NONE: {
                 } break;
 
                 case DIR_UP: {
-                    if (active_ring) {
-                        active_ring = NULL;
+                    if (active_ring->row == FIRST_RING_ROW) {
+                        if (move->from < move->to) {
+                            direction = DIR_RIGHT;
+                        } else {
+                            direction = DIR_LEFT;
+                        }
+                        delay = MOVE_DELAY;
                     } else {
-                        redraw = false;
+                        active_ring->row--;
+                        redraw = true;
                     }
                 } break;
 
                 case DIR_RIGHT: {
-
+                    if (active_ring->col == dest_col) {
+                        direction = DIR_DOWN;
+                    } else {
+                        active_ring->col++;
+                        redraw = true;
+                    }
+                    delay = MOVE_DELAY;
                 } break;
 
                 case DIR_DOWN: {
@@ -248,15 +268,20 @@ void run_app_state_machine() {
                 } break;
 
                 case DIR_LEFT: {
-
+                    if (active_ring->col == dest_col) {
+                        direction = DIR_DOWN;
+                    } else {
+                        active_ring->col--;
+                        redraw = true;
+                    }
+                    delay = MOVE_DELAY;
                 } break;
             }
-
-            if (redraw) {
-                // Draw the next animation frame (modify array of character codes).
-                animate_frame();
-            }
         }
-        v_state = V_STATE_FRAME_READY;
+        v_state = V_STATE_FRAME_ACK;
+        if (redraw) {
+            // Draw the next animation frame (modify array of character codes).
+            animate_frame();
+        }
     }
 }
