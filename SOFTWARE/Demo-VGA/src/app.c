@@ -235,13 +235,10 @@ void pop_move() {
     if (--moves) {
         Move* move = &stack[moves - 1];
         if (move->count > 1) {
-            --moves;
             push_move(move->count - 1, move->spare, move->to, move->from);
         } else {
             direction = DIR_NONE;
         }
-    } else {
-        direction = DIR_NONE;
     }
 }
 
