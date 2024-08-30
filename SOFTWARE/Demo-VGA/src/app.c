@@ -42,6 +42,10 @@
 #define LETTER_ROW     15
 #define STATUS_ROW     17
 
+#define RING_COL        7
+#define FROM_COL       14
+#define TO_COL         19
+
 #define NUM_PEGS        3
 #define NUM_RINGS       4
 #define RING_HEIGHT     2
@@ -66,9 +70,10 @@
 #define DIR_DOWN        3
 #define DIR_LEFT        4
 
-#define STARTUP_DELAY   (60*5)   // 5 seconds
-#define SOLUTION_DELAY  (60*3)   // 3 seconds
-#define MOVE_DELAY      (60/10)  // 1/10 second
+// Frame rate is 56 Hz, with pixel clock at 36 MHz
+#define STARTUP_DELAY   (56*5)   // 5 seconds
+#define SOLUTION_DELAY  (56*3)   // 3 seconds
+#define MOVE_DELAY      (56/14)  // 1/14 second
 
 typedef struct {
     uint8_t row;
@@ -189,6 +194,11 @@ void start_move(uint8_t count, uint8_t from, uint8_t to, uint8_t spare) {
     move->to = to;
     move->spare = spare;
 
+    // Update the status info on screen
+    write_at(STATUS_ROW, RING_COL, ring_index + '1');
+    write_at(STATUS_ROW, FROM_COL, from + 'A');
+    write_at(STATUS_ROW, TO_COL, to + 'A');
+
     // Because of limited screen columns, bottom-most
     // ring widths and currently moving ring width determine
     // required widths of pegs, and positions of all pegs.
@@ -267,7 +277,11 @@ void run_app_state_machine() {
 
                 case DIR_DOWN: {
                     if (active_ring->row == dest_row) {
-                        direction = DIR_NONE;
+                        if (move->count > 1) {
+
+                        } else {
+
+                        }
                     } else {
                         active_ring->row++;
                         redraw = true;
