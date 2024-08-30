@@ -180,11 +180,39 @@ uint8_t get_peg_footprint(const Peg* peg, uint8_t width) {
     return width;
 }
 
-void start_move(uint8_t count, uint8_t from, uint8_t to, uint8_t spare) {
+void start_move() {
+    Move* move = &stack[moves - 1];
+    Ring* ring = &rings[move->ring];
+
+    // Update the status info on screen
+    write_at(STATUS_ROW, RING_COL, move->ring + '1');
+    write_at(STATUS_ROW, FROM_COL, move->from + 'A');
+    write_at(STATUS_ROW, TO_COL, move->to + 'A');
+
+    // Because of limited screen columns, bottom-most
+    // ring widths and currently moving ring width determine
+    // required widths of pegs, and positions of all pegs.
+    uint8_t width0 = get_peg_footprint(&pegs[0], (move->to == 0 ? ring->width : PEG_BASE_WIDTH));
+    uint8_t width1 = get_peg_footprint(&pegs[1], (move->to == 1 ? ring->width : PEG_BASE_WIDTH));
+    uint8_t width2 = get_peg_footprint(&pegs[2], (move->to == 2 ? ring->width : PEG_BASE_WIDTH));
+
+    pegs[0].col = width0 / 2;
+    pegs[1].col = width0 + width1 / 2;
+    pegs[2].col = width0 + width1 + width2 / 2;
+
+    // Start the move.
+    delay = (move->count == NUM_RINGS ? STARTUP_DELAY : MOVE_DELAY);
+    direction = DIR_UP;
+    active_ring = ring;
+    Peg* peg = &pegs[move->to];
+    dest_row = LAST_RING_ROW - peg->count * RING_HEIGHT;
+    dest_col = peg->col;
+}
+
+void push_move(uint8_t count, uint8_t from, uint8_t to, uint8_t spare) {
     // Determine which ring to move.
     Peg* peg = &pegs[from];
     uint8_t ring_index = peg->rings[peg->count - 1];
-    Ring* ring = &rings[ring_index];
 
     // Push a move onto the stack.
     Move* move = &stack[moves++];
@@ -194,29 +222,27 @@ void start_move(uint8_t count, uint8_t from, uint8_t to, uint8_t spare) {
     move->to = to;
     move->spare = spare;
 
-    // Update the status info on screen
-    write_at(STATUS_ROW, RING_COL, ring_index + '1');
-    write_at(STATUS_ROW, FROM_COL, from + 'A');
-    write_at(STATUS_ROW, TO_COL, to + 'A');
+    if (count > 1) {
+        // Move all but the bottom ring, so that
+        // we can get to the bottom ring.
+        push_move(count - 1, from, spare, to);
+    } else {
+        start_move();
+    }
+}
 
-    // Because of limited screen columns, bottom-most
-    // ring widths and currently moving ring width determine
-    // required widths of pegs, and positions of all pegs.
-    uint8_t width0 = get_peg_footprint(&pegs[0], (to == 0 ? ring->width : PEG_BASE_WIDTH));
-    uint8_t width1 = get_peg_footprint(&pegs[1], (to == 1 ? ring->width : PEG_BASE_WIDTH));
-    uint8_t width2 = get_peg_footprint(&pegs[2], (to == 2 ? ring->width : PEG_BASE_WIDTH));
-
-    pegs[0].col = width0 / 2;
-    pegs[1].col = width0 + width1 / 2;
-    pegs[2].col = width0 + width1 + width2 / 2;
-
-    // Start the move.
-    delay = (count == NUM_RINGS ? STARTUP_DELAY : MOVE_DELAY);
-    direction = DIR_UP;
-    active_ring = ring;
-    peg = &pegs[to];
-    dest_row = LAST_RING_ROW - peg->count * RING_HEIGHT;
-    dest_col = peg->col;
+void pop_move() {
+    if (--moves) {
+        Move* move = &stack[moves - 1];
+        if (move->count > 1) {
+            --moves;
+            push_move(move->count - 1, move->spare, move->to, move->from);
+        } else {
+            direction = DIR_NONE;
+        }
+    } else {
+        direction = DIR_NONE;
+    }
 }
 
 void initialize_application() {
@@ -228,7 +254,7 @@ void initialize_application() {
     print_at(STATUS_ROW, 1, "Move #  from   to");
 
     // Prepare for first move
-    start_move(NUM_RINGS, 0, 1, 2);
+    push_move(NUM_RINGS, 0, 1, 2);
 }
 
 void run_keyboard_state_machine() {
@@ -277,11 +303,7 @@ void run_app_state_machine() {
 
                 case DIR_DOWN: {
                     if (active_ring->row == dest_row) {
-                        if (move->count > 1) {
-
-                        } else {
-
-                        }
+                        pop_move();
                     } else {
                         active_ring->row++;
                         redraw = true;
