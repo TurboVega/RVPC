@@ -232,13 +232,14 @@ void push_move(uint8_t count, uint8_t from, uint8_t to, uint8_t spare) {
 }
 
 void pop_move() {
-    if (--moves) {
-        Move* move = &stack[moves - 1];
-        if (move->count > 1) {
-            push_move(move->count - 1, move->spare, move->to, move->from);
-        } else {
-            direction = DIR_NONE;
-        }
+    Move* move = &stack[moves - 1];
+    moves--;
+    if (move->count > 1) {
+        push_move(move->count - 1, move->spare, move->to, move->from);
+    } else if (moves) {
+        pop_move();
+    } else {
+        direction = DIR_NONE;
     }
 }
 
@@ -300,6 +301,10 @@ void run_app_state_machine() {
 
                 case DIR_DOWN: {
                     if (active_ring->row == dest_row) {
+                        Peg* peg = &pegs[move->from];
+                        peg->count--;
+                        peg = &pegs[move->to];
+                        peg->rings[peg->count++] = move->ring;
                         pop_move();
                     } else {
                         active_ring->row++;
