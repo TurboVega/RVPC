@@ -71,9 +71,10 @@
 #define DIR_LEFT        4
 
 // Frame rate is 56 Hz, with pixel clock at 36 MHz
-#define STARTUP_DELAY   (56*5)   // 5 seconds
-#define SOLUTION_DELAY  (56*3)   // 3 seconds
-#define MOVE_DELAY      (56/14)  // 1/14 second
+#define SCREEN_FPS      56
+#define STARTUP_DELAY   (SCREEN_FPS*10)  // 10 seconds
+#define SOLUTION_DELAY  (SCREEN_FPS*5)   // 5 seconds
+#define MOVE_DELAY      (SCREEN_FPS/7)   // 1/7 second
 
 typedef struct {
     uint8_t row;
@@ -181,8 +182,12 @@ uint8_t get_peg_footprint(const Peg* peg, uint8_t width) {
 }
 
 void start_move() {
+    // Determine which ring to move.
     Move* move = &stack[moves - 1];
-    Ring* ring = &rings[move->ring];
+    Peg* peg = &pegs[move->from];
+    uint8_t ring_index = peg->rings[peg->count - 1];
+    move->ring = ring_index;
+    Ring* ring = &rings[ring_index];
 
     // Update the status info on screen
     write_at(STATUS_ROW, RING_COL, move->ring + '1');
@@ -204,20 +209,15 @@ void start_move() {
     delay = (move->count == NUM_RINGS ? STARTUP_DELAY : MOVE_DELAY);
     direction = DIR_UP;
     active_ring = ring;
-    Peg* peg = &pegs[move->to];
+    peg = &pegs[move->to];
     dest_row = LAST_RING_ROW - peg->count * RING_HEIGHT;
     dest_col = peg->col;
 }
 
-void push_move(uint8_t count, uint8_t from, uint8_t to, uint8_t spare) {
-    // Determine which ring to move.
-    Peg* peg = &pegs[from];
-    uint8_t ring_index = peg->rings[peg->count - 1];
-
+void push_move(uint8_t count, uint8_t from, uint8_t spare, uint8_t to) {
     // Push a move onto the stack.
     Move* move = &stack[moves++];
     move->count = count;
-    move->ring = ring_index;
     move->from = from;
     move->to = to;
     move->spare = spare;
@@ -225,19 +225,19 @@ void push_move(uint8_t count, uint8_t from, uint8_t to, uint8_t spare) {
     if (count > 1) {
         // Move all but the bottom ring, so that
         // we can get to the bottom ring.
-        push_move(count - 1, from, spare, to);
+        push_move(count - 1, from, to, spare);
     } else {
         start_move();
     }
 }
 
 void pop_move() {
-    Move* move = &stack[moves - 1];
+    Move* move = &stack[moves - 1]; // points to move just completed
     moves--;
     if (move->count > 1) {
-        push_move(move->count - 1, move->spare, move->to, move->from);
+        push_move(move->count - 1, move->spare, move->from, move->to);
     } else if (moves) {
-        pop_move();
+        start_move();
     } else {
         direction = DIR_NONE;
     }
