@@ -207,11 +207,15 @@ void start_move() {
 
     // Relocate any rings that move with a peg
     for (uint8_t r = 0; r < NUM_RINGS; r++) {
-        rings[r].col = pegs[rings[r].peg].col;
+        uint8_t old_col = rings[r].col;
+        uint8_t new_col = pegs[rings[r].peg].col;
+        rings[r].col = new_col;
+        rings[r].start += new_col - old_col;
+        rings[r].end += new_col - old_col;
     }
 
     // Start the move.
-    delay = (move->count == NUM_RINGS ? STARTUP_DELAY : MOVE_DELAY);
+    delay = MOVE_DELAY;
     direction = DIR_UP;
     active_ring = ring;
     peg = &pegs[move->to];
@@ -258,6 +262,8 @@ void initialize_application() {
 
     // Prepare for first move
     push_move(NUM_RINGS, 0, 1, 2);
+    delay = STARTUP_DELAY;
+    animate_frame();
 }
 
 void run_keyboard_state_machine() {
