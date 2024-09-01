@@ -181,19 +181,7 @@ uint8_t get_peg_footprint(const Peg* peg, uint8_t width) {
     return width;
 }
 
-void start_move() {
-    // Determine which ring to move.
-    Move* move = &stack[moves - 1];
-    Peg* peg = &pegs[move->from];
-    uint8_t ring_index = peg->rings[peg->count - 1];
-    move->ring = ring_index;
-    Ring* ring = &rings[ring_index];
-
-    // Update the status info on screen
-    write_at(STATUS_ROW, RING_COL, move->ring + '1');
-    write_at(STATUS_ROW, FROM_COL, move->from + 'A');
-    write_at(STATUS_ROW, TO_COL, move->to + 'A');
-
+void adjust_peg_columns() {
     // Because of limited screen columns, bottom-most
     // ring widths and currently moving ring width determine
     // required widths of pegs, and positions of all pegs.
@@ -214,13 +202,29 @@ void start_move() {
         rings[r].end += new_col - old_col;
     }
 
+    // Determine where the moving ring will stop
+    peg = &pegs[move->to];
+    dest_row = LAST_RING_ROW - peg->count * RING_HEIGHT;
+    dest_col = peg->col;
+}
+
+void start_move() {
+    // Determine which ring to move.
+    Move* move = &stack[moves - 1];
+    Peg* peg = &pegs[move->from];
+    uint8_t ring_index = peg->rings[peg->count - 1];
+    move->ring = ring_index;
+    Ring* ring = &rings[ring_index];
+
+    // Update the status info on screen
+    write_at(STATUS_ROW, RING_COL, move->ring + '1');
+    write_at(STATUS_ROW, FROM_COL, move->from + 'A');
+    write_at(STATUS_ROW, TO_COL, move->to + 'A');
+
     // Start the move.
     delay = MOVE_DELAY;
     direction = DIR_UP;
     active_ring = ring;
-    peg = &pegs[move->to];
-    dest_row = LAST_RING_ROW - peg->count * RING_HEIGHT;
-    dest_col = peg->col;
 }
 
 void push_move(uint8_t count, uint8_t from, uint8_t spare, uint8_t to) {
@@ -288,6 +292,9 @@ void run_app_state_machine() {
 
                 case DIR_UP: {
                     if (active_ring->row == FIRST_RING_ROW) {
+                        Peg* peg = &pegs[move->from];
+                        peg->count--;
+                        adjust_peg_columns();
                         if (move->from < move->to) {
                             direction = DIR_RIGHT;
                         } else {
@@ -313,9 +320,7 @@ void run_app_state_machine() {
                 case DIR_DOWN: {
                     if (active_ring->row == dest_row) {
                         active_ring->peg = move->to;
-                        Peg* peg = &pegs[move->from];
-                        peg->count--;
-                        peg = &pegs[move->to];
+                        Peg* peg = &pegs[move->to];
                         peg->rings[peg->count++] = move->ring;
                         pop_move();
                     } else {
