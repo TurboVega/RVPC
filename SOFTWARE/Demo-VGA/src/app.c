@@ -102,10 +102,10 @@ typedef struct {
 } Move;
 
 Ring rings[NUM_RINGS] = {
-    { LAST_RING_ROW-RING_HEIGHT*3, 4, 1, 3, 5, 3, 1 },
-    { LAST_RING_ROW-RING_HEIGHT*2, 4, 2, 2, 6, 5, 1 },
-    { LAST_RING_ROW-RING_HEIGHT*1, 4, 3, 1, 7, 7, 1 },
-    { LAST_RING_ROW-RING_HEIGHT*0, 4, 4, 0, 8, 9, 1 }
+    { LAST_RING_ROW-RING_HEIGHT*3, 4, 1, 3, 5, 3, 0 },
+    { LAST_RING_ROW-RING_HEIGHT*2, 4, 2, 2, 6, 5, 0 },
+    { LAST_RING_ROW-RING_HEIGHT*1, 4, 3, 1, 7, 7, 0 },
+    { LAST_RING_ROW-RING_HEIGHT*0, 4, 4, 0, 8, 9, 0 }
 };
 
 Peg pegs[NUM_PEGS] = {
@@ -205,6 +205,11 @@ void start_move() {
     pegs[1].col = width0 + width1 / 2;
     pegs[2].col = width0 + width1 + width2 / 2;
 
+    // Relocate any rings that move with a peg
+    for (uint8_t r = 0; r < NUM_RINGS; r++) {
+        rings[r].col = pegs[rings[r].peg].col;
+    }
+
     // Start the move.
     delay = (move->count == NUM_RINGS ? STARTUP_DELAY : MOVE_DELAY);
     direction = DIR_UP;
@@ -301,6 +306,7 @@ void run_app_state_machine() {
 
                 case DIR_DOWN: {
                     if (active_ring->row == dest_row) {
+                        active_ring->peg = move->to;
                         Peg* peg = &pegs[move->from];
                         peg->count--;
                         peg = &pegs[move->to];
