@@ -72,9 +72,9 @@
 
 // Frame rate is 56 Hz, with pixel clock at 36 MHz
 #define SCREEN_FPS      56
-#define STARTUP_DELAY   (SCREEN_FPS*10)  // 10 seconds
-#define SOLUTION_DELAY  (SCREEN_FPS*5)   // 5 seconds
-#define MOVE_DELAY      (SCREEN_FPS/7)   // 1/7 second
+#define STARTUP_DELAY   (SCREEN_FPS*6)   // 6 seconds
+#define SOLUTION_DELAY  (SCREEN_FPS*2)   // 2 seconds
+#define MOVE_DELAY      (SCREEN_FPS/14)  // 1/14 second
 
 typedef struct {
     uint8_t row;
@@ -181,13 +181,13 @@ uint8_t get_peg_footprint(const Peg* peg, uint8_t width) {
     return width;
 }
 
-void adjust_peg_columns() {
+void adjust_peg_columns(Move* move) {
     // Because of limited screen columns, bottom-most
     // ring widths and currently moving ring width determine
     // required widths of pegs, and positions of all pegs.
-    uint8_t width0 = get_peg_footprint(&pegs[0], (move->to == 0 ? ring->width : PEG_BASE_WIDTH));
-    uint8_t width1 = get_peg_footprint(&pegs[1], (move->to == 1 ? ring->width : PEG_BASE_WIDTH));
-    uint8_t width2 = get_peg_footprint(&pegs[2], (move->to == 2 ? ring->width : PEG_BASE_WIDTH));
+    uint8_t width0 = get_peg_footprint(&pegs[0], (move->to == 0 ? active_ring->width : PEG_BASE_WIDTH));
+    uint8_t width1 = get_peg_footprint(&pegs[1], (move->to == 1 ? active_ring->width : PEG_BASE_WIDTH));
+    uint8_t width2 = get_peg_footprint(&pegs[2], (move->to == 2 ? active_ring->width : PEG_BASE_WIDTH));
 
     pegs[0].col = width0 / 2;
     pegs[1].col = width0 + width1 / 2;
@@ -203,7 +203,7 @@ void adjust_peg_columns() {
     }
 
     // Determine where the moving ring will stop
-    peg = &pegs[move->to];
+    Peg* peg = &pegs[move->to];
     dest_row = LAST_RING_ROW - peg->count * RING_HEIGHT;
     dest_col = peg->col;
 }
@@ -252,7 +252,9 @@ void pop_move() {
     } else if (moves) {
         start_move();
     } else {
-        direction = DIR_NONE;
+        moves = 0;
+        push_move(NUM_RINGS, move->to, move->from, move->spare);
+        delay = STARTUP_DELAY;
     }
 }
 
@@ -294,7 +296,7 @@ void run_app_state_machine() {
                     if (active_ring->row == FIRST_RING_ROW) {
                         Peg* peg = &pegs[move->from];
                         peg->count--;
-                        adjust_peg_columns();
+                        adjust_peg_columns(move);
                         if (move->from < move->to) {
                             direction = DIR_RIGHT;
                         } else {
