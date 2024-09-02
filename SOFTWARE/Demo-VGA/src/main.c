@@ -126,50 +126,20 @@ void PWM_Config(TIM_TypeDef *TIM, uint8_t channel, uint16_t pulse, uint16_t mode
 #define VGA_VSYNC_TIM   TIM1
 #define VGA_VSYNC_CH    2
 
-#ifdef SYSCLK_FREQ_24MHZ_HSI
-	#define VGA_HSYNC_PERIOD  412
-	#define VGA_HSYNC_PULSE    46
+#define CLOCK_PRESCALER     2 // 48MHz / 2 = 24MHz
+#define TICK_CNT_DIVIDER    3 // Converts 36MHz tick counts to 12MHz tick counts
+#define TIMER_OC_MODE       TIM_OCMode_PWM1
 
-	#define VGA_VPERIOD       525
-	#define VGA_VSYNC_PULSE     2
+#define VGA_HACTIVE_PIXELS 800
+#define VGA_HSYNC_PERIOD  ((1024)/TICK_CNT_DIVIDER)
+#define VGA_HSYNC_PULSE     ((72)/TICK_CNT_DIVIDER)
 
-	#define VGA_VBACK_PORCH    12
-	#define VGA_VFRONT_PORCH   10
+#define VGA_VACTIVE_LINES 600
+#define VGA_VPERIOD       625
+#define VGA_VSYNC_PULSE     2
 
-	#define VGA_HBACK_PORCH     8
-
-	#define CHECKER_COLUMNS    25
-	#define CHECKER_ROWS       30
-#elif defined SYSCLK_FREQ_48MHZ_HSI
-	#define VGA_HSYNC_PERIOD  824
-	#define VGA_HSYNC_PULSE    92
-	
-	#define VGA_VPERIOD       525
-	#define VGA_VSYNC_PULSE     2
-
-	#define VGA_VBACK_PORCH    12
-	#define VGA_VFRONT_PORCH   10
-
-	#define VGA_HBACK_PORCH    14
-
-	#define CHECKER_COLUMNS    44
-	#define CHECKER_ROWS       20
-#elif defined SYSCLK_FREQ_36MHZ_HSI
-    #define CLOCK_PRESCALER     2 // 48MHz / 2 = 24MHz
-    #define TICK_CNT_DIVIDER    3 // Converts 36MHz tick counts to 12MHz tick counts
-    #define TIMER_OC_MODE       TIM_OCMode_PWM1
-
-    #define VGA_HACTIVE_PIXELS 800
-	#define VGA_HSYNC_PERIOD  ((1024)/TICK_CNT_DIVIDER)
-	#define VGA_HSYNC_PULSE     ((72)/TICK_CNT_DIVIDER)
-	
-    #define VGA_VACTIVE_LINES 600
-	#define VGA_VPERIOD       625
-	#define VGA_VSYNC_PULSE     2
-
-	#define VGA_VBACK_PORCH    22
-	#define VGA_VFRONT_PORCH    1
-#endif
+#define VGA_VBACK_PORCH    22
+#define VGA_VFRONT_PORCH    1
 
 extern void waste_time0();
 extern void waste_time1();
@@ -328,15 +298,14 @@ void TIM2_IRQHandler(void) {
     }
 
     scan_row -= VADJUST;
-	if (scan_row >= VEND) {
-        v_state = V_STATE_END_FRAME;
-		goto done;
-	}
-
-    if (scan_row & 1) {
-        waste_time0();
-    } else {
+    if (scan_row == 0) {
         waste_time1();
+    } else {
+        if (scan_row >= VEND) {
+            v_state = V_STATE_END_FRAME;
+            goto done;
+        }
+        waste_time0();
     }
 
 #if TALL_CHARS_LESS_LINES
