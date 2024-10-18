@@ -23,12 +23,10 @@
 
 #include "misc.h"
 #include "vga.h"
-#include "keyboard.h"
 
-extern void app_init();
-extern void app_run();
-
-extern uint8_t app_reset();
+extern void initialize_application();
+extern void run_keyboard_state_machine();
+extern void run_app_state_machine();
 
 int main(void) {
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
@@ -43,14 +41,12 @@ int main(void) {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 
 	vga_init();
-	kbd_init();
 
-	reset:
-	app_init();
+	initialize_application();
 	while (1) {
-		app_run();
-		if (app_reset()) {
-			goto reset;
+		run_keyboard_state_machine();
+		if (vga_is_frame_end()) {
+			run_app_state_machine();
 		}
 	}
 }
